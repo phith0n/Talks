@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="keywords" content="iPresst 基于Token的CSRF防御绕过" />
+	<meta name="description" content="iPresst - 基于Token的CSRF防御绕过 - " />
+	<meta name="author" content="TAT.Aishen, TAT.CG, TAT.DM, TAT.Jarvis, TAT.Kinvix, TAT.Weber, TAT.Yussica" />
+	<meta name="copyright" content="ipresst.com" />
+	<meta name="application-name" content="iPresst" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="viewport" content="minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, width=device-width, user-scalable=no">
+
+	<title>基于Token的CSRF防御绕过 - iPresst.com</title>
+
+	<link type="text/css" rel="stylesheet" href="css/play/play.all.css?t=1422196726413"/>
+<style id="css-animate" type="text/css">@charset "UTF-8";.animated{-webkit-animation-duration:1s;-moz-animation-duration:1s;-o-animation-duration:1s;animation-duration:1s;-webkit-animation-fill-mode:both;-moz-animation-fill-mode:both;-o-animation-fill-mode:both;animation-fill-mode:both}.animated.hinge{-webkit-animation-duration:2s;-moz-animation-duration:2s;-o-animation-duration:2s;animation-duration:2s}@-webkit-keyframes flash{0%,100%,50%{opacity:1}25%,75%{opacity:0}}@-moz-keyframes flash{0%,100%,50%{opacity:1}25%,75%{opacity:0}}@-o-keyframes flash{0%,100%,50%{opacity:1}25%,75%{opacity:0}}@keyframes flash{0%,100%,50%{opacity:1}25%,75%{opacity:0}}.flash{-webkit-animation-name:flash;-moz-animation-name:flash;-o-animation-name:flash;animation-name:flash}@-webkit-keyframes shake{0%,100%{-webkit-transform:translateX(0)}10%,30%,50%,70%,90%{-webkit-transform:translateX(-10px)}20%,40%,60%,80%{-webkit-transform:translateX(10px)}}@-moz-keyframes shake{0%,100%{-moz-transform:translateX(0)}10%,30%,50%,70%,90%{-moz-transform:translateX(-10px)}20%,40%,60%,80%{-moz-transform:translateX(10px)}}@-o-keyframes shake{0%,100%{-o-transform:translateX(0)}10%,30%,50%,70%,90%{-o-transform:translateX(-10px)}20%,40%,60%,80%{-o-transform:translateX(10px)}}@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-10px)}20%,40%,60%,80%{transform:translateX(10px)}}.shake{-webkit-animation-name:shake;-moz-animation-name:shake;-o-animation-name:shake;animation-name:shake}@-webkit-keyframes bounce{0%,100%,20%,50%,80%{-webkit-transform:translateY(0)}40%{-webkit-transform:translateY(-60px)}60%{-webkit-transform:translateY(-15px)}}@-moz-keyframes bounce{0%,100%,20%,50%,80%{-moz-transform:translateY(0)}40%{-moz-transform:translateY(-30px)}60%{-moz-transform:translateY(-15px)}}@-o-keyframes bounce{0%,100%,20%,50%,80%{-o-transform:translateY(0)}40%{-o-transform:translateY(-30px)}60%{-o-transform:translateY(-15px)}}@keyframes bounce{0%,100%,20%,50%,80%{transform:translateY(0)}40%{transform:translateY(-30px)}60%{transform:translateY(-15px)}}.bounce{-webkit-animation-name:bounce;-moz-animation-name:bounce;-o-animation-name:bounce;animation-name:bounce}@-webkit-keyframes tada{0%{-webkit-transform:scale(1)}10%,20%{-webkit-transform:scale(.9) rotate(-3deg)}30%,50%,70%,90%{-webkit-transform:scale(1.1) rotate(3deg)}40%,60%,80%{-webkit-transform:scale(1.1) rotate(-3deg)}100%{-webkit-transform:scale(1) rotate(0)}}@-moz-keyframes tada{0%{-moz-transform:scale(1)}10%,20%{-moz-transform:scale(.9) rotate(-3deg)}30%,50%,70%,90%{-moz-transform:scale(1.1) rotate(3deg)}40%,60%,80%{-moz-transform:scale(1.1) rotate(-3deg)}100%{-moz-transform:scale(1) rotate(0)}}@-o-keyframes tada{0%{-o-transform:scale(1)}10%,20%{-o-transform:scale(.9) rotate(-3deg)}30%,50%,70%,90%{-o-transform:scale(1.1) rotate(3deg)}40%,60%,80%{-o-transform:scale(1.1) rotate(-3deg)}100%{-o-transform:scale(1) rotate(0)}}@keyframes tada{0%{transform:scale(1)}10%,20%{transform:scale(.9) rotate(-3deg)}30%,50%,70%,90%{transform:scale(1.1) rotate(3deg)}40%,60%,80%{transform:scale(1.1) rotate(-3deg)}100%{transform:scale(1) rotate(0)}}.tada{-webkit-animation-name:tada;-moz-animation-name:tada;-o-animation-name:tada;animation-name:tada}@-webkit-keyframes swing{100%,20%,40%,60%,80%{-webkit-transform-origin:top center}20%{-webkit-transform:rotate(15deg)}40%{-webkit-transform:rotate(-10deg)}60%{-webkit-transform:rotate(5deg)}80%{-webkit-transform:rotate(-5deg)}100%{-webkit-transform:rotate(0deg)}}@-moz-keyframes swing{20%{-moz-transform:rotate(15deg)}40%{-moz-transform:rotate(-10deg)}60%{-moz-transform:rotate(5deg)}80%{-moz-transform:rotate(-5deg)}100%{-moz-transform:rotate(0deg)}}@-o-keyframes swing{20%{-o-transform:rotate(15deg)}40%{-o-transform:rotate(-10deg)}60%{-o-transform:rotate(5deg)}80%{-o-transform:rotate(-5deg)}100%{-o-transform:rotate(0deg)}}@keyframes swing{20%{transform:rotate(15deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(5deg)}80%{transform:rotate(-5deg)}100%{transform:rotate(0deg)}}.swing{-webkit-transform-origin:top center;-moz-transform-origin:top center;-o-transform-origin:top center;transform-origin:top center;-webkit-animation-name:swing;-moz-animation-name:swing;-o-animation-name:swing;animation-name:swing}@-webkit-keyframes wobble{0%{-webkit-transform:translateX(0)}15%{-webkit-transform:translateX(-25%) rotate(-5deg)}30%{-webkit-transform:translateX(20%) rotate(3deg)}45%{-webkit-transform:translateX(-15%) rotate(-3deg)}60%{-webkit-transform:translateX(10%) rotate(2deg)}75%{-webkit-transform:translateX(-5%) rotate(-1deg)}100%{-webkit-transform:translateX(0)}}@-moz-keyframes wobble{0%{-moz-transform:translateX(0)}15%{-moz-transform:translateX(-25%) rotate(-5deg)}30%{-moz-transform:translateX(20%) rotate(3deg)}45%{-moz-transform:translateX(-15%) rotate(-3deg)}60%{-moz-transform:translateX(10%) rotate(2deg)}75%{-moz-transform:translateX(-5%) rotate(-1deg)}100%{-moz-transform:translateX(0)}}@-o-keyframes wobble{0%{-o-transform:translateX(0)}15%{-o-transform:translateX(-25%) rotate(-5deg)}30%{-o-transform:translateX(20%) rotate(3deg)}45%{-o-transform:translateX(-15%) rotate(-3deg)}60%{-o-transform:translateX(10%) rotate(2deg)}75%{-o-transform:translateX(-5%) rotate(-1deg)}100%{-o-transform:translateX(0)}}@keyframes wobble{0%{transform:translateX(0)}15%{transform:translateX(-25%) rotate(-5deg)}30%{transform:translateX(20%) rotate(3deg)}45%{transform:translateX(-15%) rotate(-3deg)}60%{transform:translateX(10%) rotate(2deg)}75%{transform:translateX(-5%) rotate(-1deg)}100%{transform:translateX(0)}}.wobble{-webkit-animation-name:wobble;-moz-animation-name:wobble;-o-animation-name:wobble;animation-name:wobble}@-webkit-keyframes pulse{0%{-webkit-transform:scale(1)}50%{-webkit-transform:scale(1.1)}100%{-webkit-transform:scale(1)}}@-moz-keyframes pulse{0%{-moz-transform:scale(1)}50%{-moz-transform:scale(1.1)}100%{-moz-transform:scale(1)}}@-o-keyframes pulse{0%{-o-transform:scale(1)}50%{-o-transform:scale(1.1)}100%{-o-transform:scale(1)}}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pulse{-webkit-animation-name:pulse;-moz-animation-name:pulse;-o-animation-name:pulse;animation-name:pulse}@-webkit-keyframes flip{0%{-webkit-transform:perspective(800px) rotateY(0);-webkit-animation-timing-function:ease-out}30%{-webkit-transform:perspective(800px) translateZ(150px) rotateY(170deg);-webkit-animation-timing-function:ease-out}50%{-webkit-transform:perspective(800px) translateZ(150px) rotateY(190deg) scale(1);-webkit-animation-timing-function:ease-in}70%{-webkit-transform:perspective(800px) rotateY(360deg) scale(.95);-webkit-animation-timing-function:ease-in}100%{-webkit-transform:perspective(800px) scale(1);-webkit-animation-timing-function:ease-in}}@-moz-keyframes flip{0%{-moz-transform:perspective(800px) rotateY(0);-moz-animation-timing-function:ease-out}30%{-moz-transform:perspective(800px) translateZ(150px) rotateY(170deg);-moz-animation-timing-function:ease-out}50%{-moz-transform:perspective(800px) translateZ(150px) rotateY(190deg) scale(1);-moz-animation-timing-function:ease-in}70%{-moz-transform:perspective(800px) rotateY(360deg) scale(.95);-moz-animation-timing-function:ease-in}100%{-moz-transform:perspective(800px) scale(1);-moz-animation-timing-function:ease-in}}@-o-keyframes flip{0%{-o-transform:perspective(800px) rotateY(0);-o-animation-timing-function:ease-out}30%{-o-transform:perspective(800px) translateZ(150px) rotateY(170deg);-o-animation-timing-function:ease-out}50%{-o-transform:perspective(800px) translateZ(150px) rotateY(190deg) scale(1);-o-animation-timing-function:ease-in}70%{-o-transform:perspective(800px) rotateY(360deg) scale(.95);-o-animation-timing-function:ease-in}100%{-o-transform:perspective(800px) scale(1);-o-animation-timing-function:ease-in}}@keyframes flip{0%{transform:perspective(800px) rotateY(0);animation-timing-function:ease-out}30%{transform:perspective(800px) translateZ(150px) rotateY(170deg);animation-timing-function:ease-out}50%{transform:perspective(800px) translateZ(150px) rotateY(190deg) scale(1);animation-timing-function:ease-in}70%{transform:perspective(800px) rotateY(360deg) scale(.95);animation-timing-function:ease-in}100%{transform:perspective(800px) scale(1);animation-timing-function:ease-in}}.flip{-webkit-animation-name:flip;-moz-animation-name:flip;-o-animation-name:flip;animation-name:flip;-webkit-backface-visibility:visible!important;-moz-backface-visibility:visible!important;-o-backface-visibility:visible!important;backface-visibility:visible!important}@-webkit-keyframes flipInX{0%{-webkit-transform:perspective(400px) rotateX(90deg);opacity:0}40%{-webkit-transform:perspective(400px) rotateX(-10deg)}70%{-webkit-transform:perspective(400px) rotateX(10deg)}100%{-webkit-transform:perspective(400px) rotateX(0deg);opacity:1}}@-moz-keyframes flipInX{0%{-moz-transform:perspective(400px) rotateX(90deg);opacity:0}40%{-moz-transform:perspective(400px) rotateX(-10deg)}70%{-moz-transform:perspective(400px) rotateX(10deg)}100%{-moz-transform:perspective(400px) rotateX(0deg);opacity:1}}@-o-keyframes flipInX{0%{-o-transform:perspective(400px) rotateX(90deg);opacity:0}40%{-o-transform:perspective(400px) rotateX(-10deg)}70%{-o-transform:perspective(400px) rotateX(10deg)}100%{-o-transform:perspective(400px) rotateX(0deg);opacity:1}}@keyframes flipInX{0%{transform:perspective(400px) rotateX(90deg);opacity:0}40%{transform:perspective(400px) rotateX(-10deg)}70%{transform:perspective(400px) rotateX(10deg)}100%{transform:perspective(400px) rotateX(0deg);opacity:1}}.flipInX{-webkit-animation-name:flipInX;-moz-animation-name:flipInX;-o-animation-name:flipInX;animation-name:flipInX;-webkit-backface-visibility:visible!important;-moz-backface-visibility:visible!important;-o-backface-visibility:visible!important;backface-visibility:visible!important}@-webkit-keyframes flipOutX{0%{-webkit-transform:perspective(400px) rotateX(0deg);opacity:1}100%{-webkit-transform:perspective(400px) rotateX(90deg);opacity:0}}@-moz-keyframes flipOutX{0%{-moz-transform:perspective(400px) rotateX(0deg);opacity:1}100%{-moz-transform:perspective(400px) rotateX(90deg);opacity:0}}@-o-keyframes flipOutX{0%{-o-transform:perspective(400px) rotateX(0deg);opacity:1}100%{-o-transform:perspective(400px) rotateX(90deg);opacity:0}}@keyframes flipOutX{0%{transform:perspective(400px) rotateX(0deg);opacity:1}100%{transform:perspective(400px) rotateX(90deg);opacity:0}}.flipOutX{-webkit-animation-name:flipOutX;-moz-animation-name:flipOutX;-o-animation-name:flipOutX;animation-name:flipOutX;-webkit-backface-visibility:visible!important;-moz-backface-visibility:visible!important;-o-backface-visibility:visible!important;backface-visibility:visible!important}@-webkit-keyframes flipInY{0%{-webkit-transform:perspective(400px) rotateY(90deg);opacity:0}40%{-webkit-transform:perspective(400px) rotateY(-10deg)}70%{-webkit-transform:perspective(400px) rotateY(10deg)}100%{-webkit-transform:perspective(400px) rotateY(0deg);opacity:1}}@-moz-keyframes flipInY{0%{-moz-transform:perspective(400px) rotateY(90deg);opacity:0}40%{-moz-transform:perspective(400px) rotateY(-10deg)}70%{-moz-transform:perspective(400px) rotateY(10deg)}100%{-moz-transform:perspective(400px) rotateY(0deg);opacity:1}}@-o-keyframes flipInY{0%{-o-transform:perspective(400px) rotateY(90deg);opacity:0}40%{-o-transform:perspective(400px) rotateY(-10deg)}70%{-o-transform:perspective(400px) rotateY(10deg)}100%{-o-transform:perspective(400px) rotateY(0deg);opacity:1}}@keyframes flipInY{0%{transform:perspective(400px) rotateY(90deg);opacity:0}40%{transform:perspective(400px) rotateY(-10deg)}70%{transform:perspective(400px) rotateY(10deg)}100%{transform:perspective(400px) rotateY(0deg);opacity:1}}.flipInY{-webkit-animation-name:flipInY;-moz-animation-name:flipInY;-o-animation-name:flipInY;animation-name:flipInY;-webkit-backface-visibility:visible!important;-moz-backface-visibility:visible!important;-o-backface-visibility:visible!important;backface-visibility:visible!important}@-webkit-keyframes flipOutY{0%{-webkit-transform:perspective(400px) rotateY(0deg);opacity:1}100%{-webkit-transform:perspective(400px) rotateY(90deg);opacity:0}}@-moz-keyframes flipOutY{0%{-moz-transform:perspective(400px) rotateY(0deg);opacity:1}100%{-moz-transform:perspective(400px) rotateY(90deg);opacity:0}}@-o-keyframes flipOutY{0%{-o-transform:perspective(400px) rotateY(0deg);opacity:1}100%{-o-transform:perspective(400px) rotateY(90deg);opacity:0}}@keyframes flipOutY{0%{transform:perspective(400px) rotateY(0deg);opacity:1}100%{transform:perspective(400px) rotateY(90deg);opacity:0}}.flipOutY{-webkit-animation-name:flipOutY;-moz-animation-name:flipOutY;-o-animation-name:flipOutY;animation-name:flipOutY;-webkit-backface-visibility:visible!important;-moz-backface-visibility:visible!important;-o-backface-visibility:visible!important;backface-visibility:visible!important}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@-moz-keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@-o-keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}.fadeIn{-webkit-animation-name:fadeIn;-moz-animation-name:fadeIn;-o-animation-name:fadeIn;animation-name:fadeIn}@-webkit-keyframes fadeInUp{30%,from{-webkit-transform:translateY(50px);opacity:0}to{-webkit-transform:translateY(0);opacity:1}}@-moz-keyframes fadeInUp{0%{-moz-transform:translateY(50px);opacity:0}100%{-moz-transform:translateY(0);opacity:1}}@-o-keyframes fadeInUp{0%{-o-transform:translateY(50px);opacity:0}100%{-o-transform:translateY(0);opacity:1}}@keyframes fadeInUp{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}.fadeInUp{-webkit-animation-name:fadeInUp;-moz-animation-name:fadeInUp;-o-animation-name:fadeInUp;animation-name:fadeInUp}@-webkit-keyframes fadeInDown{0%{-webkit-transform:translateY(-50px);opacity:0}100%{-webkit-transform:translateY(0);opacity:1}}@-moz-keyframes fadeInDown{0%{-moz-transform:translateY(-50px);opacity:0}100%{-moz-transform:translateY(0);opacity:1}}@-o-keyframes fadeInDown{0%{-o-transform:translateY(-50px);opacity:0}100%{-o-transform:translateY(0);opacity:1}}@keyframes fadeInDown{0%{transform:translateY(-20px);opacity:0}100%{transform:translateY(0);opacity:1}}.fadeInDown{-webkit-animation-name:fadeInDown;-moz-animation-name:fadeInDown;-o-animation-name:fadeInDown;animation-name:fadeInDown}@-webkit-keyframes fadeInLeft{0%,30%{-webkit-transform:translateX(-50px);opacity:0}100%{-webkit-transform:translateX(0);opacity:1}}@-moz-keyframes fadeInLeft{0%{-moz-transform:translateX(-50px);opacity:0}100%{-moz-transform:translateX(0);opacity:1}}@-o-keyframes fadeInLeft{0%{-o-transform:translateX(-50px);opacity:0}100%{-o-transform:translateX(0);opacity:1}}@keyframes fadeInLeft{0%{transform:translateX(-20px);opacity:0}100%{transform:translateX(0);opacity:1}}.fadeInLeft{-webkit-animation-name:fadeInLeft;-moz-animation-name:fadeInLeft;-o-animation-name:fadeInLeft;animation-name:fadeInLeft}@-webkit-keyframes fadeInRight{0%{-webkit-transform:translateX(50px);opacity:0}100%{-webkit-transform:translateX(0);opacity:1}}@-moz-keyframes fadeInRight{0%{-moz-transform:translateX(50px);opacity:0}100%{-moz-transform:translateX(0);opacity:1}}@-o-keyframes fadeInRight{0%{-o-transform:translateX(50px);opacity:0}100%{-o-transform:translateX(0);opacity:1}}@keyframes fadeInRight{0%{transform:translateX(50px);opacity:0}100%{transform:translateX(0);opacity:1}}.fadeInRight{-webkit-animation-name:fadeInRight;-moz-animation-name:fadeInRight;-o-animation-name:fadeInRight;animation-name:fadeInRight}@-webkit-keyframes fadeInUpBig{0%{-webkit-transform:translateY(2000px);opacity:0}100%{-webkit-transform:translateY(0);opacity:1}}@-moz-keyframes fadeInUpBig{0%{-moz-transform:translateY(2000px);opacity:0}100%{-moz-transform:translateY(0);opacity:1}}@-o-keyframes fadeInUpBig{0%{-o-transform:translateY(2000px);opacity:0}100%{-o-transform:translateY(0);opacity:1}}@keyframes fadeInUpBig{0%{transform:translateY(2000px);opacity:0}100%{transform:translateY(0);opacity:1}}.fadeInUpBig{-webkit-animation-name:fadeInUpBig;-moz-animation-name:fadeInUpBig;-o-animation-name:fadeInUpBig;animation-name:fadeInUpBig}@-webkit-keyframes fadeInDownBig{0%{-webkit-transform:translateY(-2000px);opacity:0}100%{-webkit-transform:translateY(0);opacity:1}}@-moz-keyframes fadeInDownBig{0%{-moz-transform:translateY(-2000px);opacity:0}100%{-moz-transform:translateY(0);opacity:1}}@-o-keyframes fadeInDownBig{0%{-o-transform:translateY(-2000px);opacity:0}100%{-o-transform:translateY(0);opacity:1}}@keyframes fadeInDownBig{0%{transform:translateY(-2000px);opacity:0}100%{transform:translateY(0);opacity:1}}.fadeInDownBig{-webkit-animation-name:fadeInDownBig;-moz-animation-name:fadeInDownBig;-o-animation-name:fadeInDownBig;animation-name:fadeInDownBig}@-webkit-keyframes fadeInLeftBig{0%{-webkit-transform:translateX(-2000px);opacity:0}100%{-webkit-transform:translateX(0);opacity:1}}@-moz-keyframes fadeInLeftBig{0%{-moz-transform:translateX(-2000px);opacity:0}100%{-moz-transform:translateX(0);opacity:1}}@-o-keyframes fadeInLeftBig{0%{-o-transform:translateX(-2000px);opacity:0}100%{-o-transform:translateX(0);opacity:1}}@keyframes fadeInLeftBig{0%{transform:translateX(-2000px);opacity:0}100%{transform:translateX(0);opacity:1}}.fadeInLeftBig{-webkit-animation-name:fadeInLeftBig;-moz-animation-name:fadeInLeftBig;-o-animation-name:fadeInLeftBig;animation-name:fadeInLeftBig}@-webkit-keyframes fadeInRightBig{0%{-webkit-transform:translateX(2000px);opacity:0}100%{-webkit-transform:translateX(0);opacity:1}}@-moz-keyframes fadeInRightBig{0%{-moz-transform:translateX(2000px);opacity:0}100%{-moz-transform:translateX(0);opacity:1}}@-o-keyframes fadeInRightBig{0%{-o-transform:translateX(2000px);opacity:0}100%{-o-transform:translateX(0);opacity:1}}@keyframes fadeInRightBig{0%{transform:translateX(2000px);opacity:0}100%{transform:translateX(0);opacity:1}}.fadeInRightBig{-webkit-animation-name:fadeInRightBig;-moz-animation-name:fadeInRightBig;-o-animation-name:fadeInRightBig;animation-name:fadeInRightBig}@-webkit-keyframes fadeOut{0%{opacity:1}100%{opacity:0}}@-moz-keyframes fadeOut{0%{opacity:1}100%{opacity:0}}@-o-keyframes fadeOut{0%{opacity:1}100%{opacity:0}}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}.fadeOut{-webkit-animation-name:fadeOut;-moz-animation-name:fadeOut;-o-animation-name:fadeOut;animation-name:fadeOut}@-webkit-keyframes fadeOutUp{0%{-webkit-transform:translateY(0);opacity:1}100%{-webkit-transform:translateY(-50px);opacity:0}}@-moz-keyframes fadeOutUp{0%{-moz-transform:translateY(0);opacity:1}100%{-moz-transform:translateY(-50px);opacity:0}}@-o-keyframes fadeOutUp{0%{-o-transform:translateY(0);opacity:1}100%{-o-transform:translateY(-50px);opacity:0}}@keyframes fadeOutUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-50px);opacity:0}}.fadeOutUp{-webkit-animation-name:fadeOutUp;-moz-animation-name:fadeOutUp;-o-animation-name:fadeOutUp;animation-name:fadeOutUp}@-webkit-keyframes fadeOutDown{0%{-webkit-transform:translateY(0);opacity:1}100%{-webkit-transform:translateY(50px);opacity:0}}@-moz-keyframes fadeOutDown{0%{-moz-transform:translateY(0);opacity:1}100%{-moz-transform:translateY(50px);opacity:0}}@-o-keyframes fadeOutDown{0%{-o-transform:translateY(0);opacity:1}100%{-o-transform:translateY(50px);opacity:0}}@keyframes fadeOutDown{0%{transform:translateY(0);opacity:1}100%{transform:translateY(50px);opacity:0}}.fadeOutDown{-webkit-animation-name:fadeOutDown;-moz-animation-name:fadeOutDown;-o-animation-name:fadeOutDown;animation-name:fadeOutDown}@-webkit-keyframes fadeOutLeft{0%{-webkit-transform:translateX(0);opacity:1}100%{-webkit-transform:translateX(-50px);opacity:0}}@-moz-keyframes fadeOutLeft{0%{-moz-transform:translateX(0);opacity:1}100%{-moz-transform:translateX(-50px);opacity:0}}@-o-keyframes fadeOutLeft{0%{-o-transform:translateX(0);opacity:1}100%{-o-transform:translateX(-50px);opacity:0}}@keyframes fadeOutLeft{0%{transform:translateX(0);opacity:1}100%{transform:translateX(-50px);opacity:0}}.fadeOutLeft{-webkit-animation-name:fadeOutLeft;-moz-animation-name:fadeOutLeft;-o-animation-name:fadeOutLeft;animation-name:fadeOutLeft}@-webkit-keyframes fadeOutRight{0%{-webkit-transform:translateX(0);opacity:1}100%{-webkit-transform:translateX(50px);opacity:0}}@-moz-keyframes fadeOutRight{0%{-moz-transform:translateX(0);opacity:1}100%{-moz-transform:translateX(50px);opacity:0}}@-o-keyframes fadeOutRight{0%{-o-transform:translateX(0);opacity:1}100%{-o-transform:translateX(50px);opacity:0}}@keyframes fadeOutRight{0%{transform:translateX(0);opacity:1}100%{transform:translateX(50px);opacity:0}}.fadeOutRight{-webkit-animation-name:fadeOutRight;-moz-animation-name:fadeOutRight;-o-animation-name:fadeOutRight;animation-name:fadeOutRight}@-webkit-keyframes fadeOutUpBig{0%{-webkit-transform:translateY(0);opacity:1}100%{-webkit-transform:translateY(-2000px);opacity:0}}@-moz-keyframes fadeOutUpBig{0%{-moz-transform:translateY(0);opacity:1}100%{-moz-transform:translateY(-2000px);opacity:0}}@-o-keyframes fadeOutUpBig{0%{-o-transform:translateY(0);opacity:1}100%{-o-transform:translateY(-2000px);opacity:0}}@keyframes fadeOutUpBig{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-2000px);opacity:0}}.fadeOutUpBig{-webkit-animation-name:fadeOutUpBig;-moz-animation-name:fadeOutUpBig;-o-animation-name:fadeOutUpBig;animation-name:fadeOutUpBig}@-webkit-keyframes fadeOutDownBig{0%{-webkit-transform:translateY(0);opacity:1}100%{-webkit-transform:translateY(2000px);opacity:0}}@-moz-keyframes fadeOutDownBig{0%{-moz-transform:translateY(0);opacity:1}100%{-moz-transform:translateY(2000px);opacity:0}}@-o-keyframes fadeOutDownBig{0%{-o-transform:translateY(0);opacity:1}100%{-o-transform:translateY(2000px);opacity:0}}@keyframes fadeOutDownBig{0%{transform:translateY(0);opacity:1}100%{transform:translateY(2000px);opacity:0}}.fadeOutDownBig{-webkit-animation-name:fadeOutDownBig;-moz-animation-name:fadeOutDownBig;-o-animation-name:fadeOutDownBig;animation-name:fadeOutDownBig}@-webkit-keyframes fadeOutLeftBig{0%{-webkit-transform:translateX(0);opacity:1}100%{-webkit-transform:translateX(-2000px);opacity:0}}@-moz-keyframes fadeOutLeftBig{0%{-moz-transform:translateX(0);opacity:1}100%{-moz-transform:translateX(-2000px);opacity:0}}@-o-keyframes fadeOutLeftBig{0%{-o-transform:translateX(0);opacity:1}100%{-o-transform:translateX(-2000px);opacity:0}}@keyframes fadeOutLeftBig{0%{transform:translateX(0);opacity:1}100%{transform:translateX(-2000px);opacity:0}}.fadeOutLeftBig{-webkit-animation-name:fadeOutLeftBig;-moz-animation-name:fadeOutLeftBig;-o-animation-name:fadeOutLeftBig;animation-name:fadeOutLeftBig}@-webkit-keyframes fadeOutRightBig{0%{-webkit-transform:translateX(0);opacity:1}100%{-webkit-transform:translateX(2000px);opacity:0}}@-moz-keyframes fadeOutRightBig{0%{-moz-transform:translateX(0);opacity:1}100%{-moz-transform:translateX(2000px);opacity:0}}@-o-keyframes fadeOutRightBig{0%{-o-transform:translateX(0);opacity:1}100%{-o-transform:translateX(2000px);opacity:0}}@keyframes fadeOutRightBig{0%{transform:translateX(0);opacity:1}100%{transform:translateX(2000px);opacity:0}}.fadeOutRightBig{-webkit-animation-name:fadeOutRightBig;-moz-animation-name:fadeOutRightBig;-o-animation-name:fadeOutRightBig;animation-name:fadeOutRightBig}@-webkit-keyframes bounceIn{0%{-webkit-transform:scale(.3);opacity:0}50%{-webkit-transform:scale(1.05);opacity:1}70%{-webkit-transform:scale(.9)}100%{-webkit-transform:scale(1)}}@-moz-keyframes bounceIn{0%{-moz-transform:scale(.3);opacity:0}50%{-moz-transform:scale(1.05);opacity:1}70%{-moz-transform:scale(.9)}100%{-moz-transform:scale(1)}}@-o-keyframes bounceIn{0%{-o-transform:scale(.3);opacity:0}50%{-o-transform:scale(1.05);opacity:1}70%{-o-transform:scale(.9)}100%{-o-transform:scale(1)}}@keyframes bounceIn{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.05);opacity:1}70%{transform:scale(.9)}100%{transform:scale(1)}}.bounceIn{-webkit-animation-name:bounceIn;-moz-animation-name:bounceIn;-o-animation-name:bounceIn;animation-name:bounceIn}@-webkit-keyframes bounceInUp{0%{-webkit-transform:translateY(2000px);opacity:0}60%{-webkit-transform:translateY(-100px);opacity:1}80%{-webkit-transform:translateY(30px)}100%{-webkit-transform:translateY(0)}}@-moz-keyframes bounceInUp{0%{-moz-transform:translateY(2000px);opacity:0}60%{-moz-transform:translateY(-100px);opacity:1}80%{-moz-transform:translateY(30px)}100%{-moz-transform:translateY(0)}}@-o-keyframes bounceInUp{0%{-o-transform:translateY(2000px);opacity:0}60%{-o-transform:translateY(-100px);opacity:1}80%{-o-transform:translateY(30px)}100%{-o-transform:translateY(0)}}@keyframes bounceInUp{0%{transform:translateY(2000px);opacity:0}60%{transform:translateY(-100px);opacity:1}80%{transform:translateY(30px)}100%{transform:translateY(0)}}.bounceInUp{-webkit-animation-name:bounceInUp;-moz-animation-name:bounceInUp;-o-animation-name:bounceInUp;animation-name:bounceInUp}@-webkit-keyframes bounceInDown{0%{-webkit-transform:translateY(-2000px);opacity:0}60%{-webkit-transform:translateY(100px);opacity:1}80%{-webkit-transform:translateY(-30px)}100%{-webkit-transform:translateY(0)}}@-moz-keyframes bounceInDown{0%{-moz-transform:translateY(-2000px);opacity:0}60%{-moz-transform:translateY(100px);opacity:1}80%{-moz-transform:translateY(-30px)}100%{-moz-transform:translateY(0)}}@-o-keyframes bounceInDown{0%{-o-transform:translateY(-2000px);opacity:0}60%{-o-transform:translateY(100px);opacity:1}80%{-o-transform:translateY(-30px)}100%{-o-transform:translateY(0)}}@keyframes bounceInDown{0%{transform:translateY(-2000px);opacity:0}60%{transform:translateY(100px);opacity:1}80%{transform:translateY(-30px)}100%{transform:translateY(0)}}.bounceInDown{-webkit-animation-name:bounceInDown;-moz-animation-name:bounceInDown;-o-animation-name:bounceInDown;animation-name:bounceInDown}@-webkit-keyframes bounceInLeft{0%{-webkit-transform:translateX(-2000px);opacity:0}60%{-webkit-transform:translateX(100px);opacity:1}80%{-webkit-transform:translateX(-30px)}100%{-webkit-transform:translateX(0)}}@-moz-keyframes bounceInLeft{0%{-moz-transform:translateX(-2000px);opacity:0}60%{-moz-transform:translateX(100px);opacity:1}80%{-moz-transform:translateX(-30px)}100%{-moz-transform:translateX(0)}}@-o-keyframes bounceInLeft{0%{-o-transform:translateX(-2000px);opacity:0}60%{-o-transform:translateX(100px);opacity:1}80%{-o-transform:translateX(-30px)}100%{-o-transform:translateX(0)}}@keyframes bounceInLeft{0%{transform:translateX(-2000px);opacity:0}60%{transform:translateX(100px);opacity:1}80%{transform:translateX(-30px)}100%{transform:translateX(0)}}.bounceInLeft{-webkit-animation-name:bounceInLeft;-moz-animation-name:bounceInLeft;-o-animation-name:bounceInLeft;animation-name:bounceInLeft}@-webkit-keyframes bounceInRight{0%{-webkit-transform:translateX(2000px);opacity:0}60%{-webkit-transform:translateX(-100px);opacity:1}80%{-webkit-transform:translateX(30px)}100%{-webkit-transform:translateX(0)}}@-moz-keyframes bounceInRight{0%{-moz-transform:translateX(2000px);opacity:0}60%{-moz-transform:translateX(-100px);opacity:1}80%{-moz-transform:translateX(30px)}100%{-moz-transform:translateX(0)}}@-o-keyframes bounceInRight{0%{-o-transform:translateX(2000px);opacity:0}60%{-o-transform:translateX(-100px);opacity:1}80%{-o-transform:translateX(30px)}100%{-o-transform:translateX(0)}}@keyframes bounceInRight{0%{transform:translateX(2000px);opacity:0}60%{transform:translateX(-100px);opacity:1}80%{transform:translateX(30px)}100%{transform:translateX(0)}}.bounceInRight{-webkit-animation-name:bounceInRight;-moz-animation-name:bounceInRight;-o-animation-name:bounceInRight;animation-name:bounceInRight}@-webkit-keyframes bounceOut{0%{-webkit-transform:scale(1)}25%{-webkit-transform:scale(.95)}50%{-webkit-transform:scale(1.1);opacity:1}100%{-webkit-transform:scale(.3);opacity:0}}@-moz-keyframes bounceOut{0%{-moz-transform:scale(1)}25%{-moz-transform:scale(.95)}50%{-moz-transform:scale(1.1);opacity:1}100%{-moz-transform:scale(.3);opacity:0}}@-o-keyframes bounceOut{0%{-o-transform:scale(1)}25%{-o-transform:scale(.95)}50%{-o-transform:scale(1.1);opacity:1}100%{-o-transform:scale(.3);opacity:0}}@keyframes bounceOut{0%{transform:scale(1)}25%{transform:scale(.95)}50%{transform:scale(1.1);opacity:1}100%{transform:scale(.3);opacity:0}}.bounceOut{-webkit-animation-name:bounceOut;-moz-animation-name:bounceOut;-o-animation-name:bounceOut;animation-name:bounceOut}@-webkit-keyframes bounceOutUp{0%{-webkit-transform:translateY(0)}20%{-webkit-transform:translateY(100px);opacity:1}100%{-webkit-transform:translateY(-2000px);opacity:0}}@-moz-keyframes bounceOutUp{0%{-moz-transform:translateY(0)}20%{-moz-transform:translateY(100px);opacity:1}100%{-moz-transform:translateY(-2000px);opacity:0}}@-o-keyframes bounceOutUp{0%{-o-transform:translateY(0)}20%{-o-transform:translateY(100px);opacity:1}100%{-o-transform:translateY(-2000px);opacity:0}}@keyframes bounceOutUp{0%{transform:translateY(0)}20%{transform:translateY(100px);opacity:1}100%{transform:translateY(-2000px);opacity:0}}.bounceOutUp{-webkit-animation-name:bounceOutUp;-moz-animation-name:bounceOutUp;-o-animation-name:bounceOutUp;animation-name:bounceOutUp}@-webkit-keyframes bounceOutDown{0%{-webkit-transform:translateY(0)}20%{-webkit-transform:translateY(-100px);opacity:1}100%{-webkit-transform:translateY(2000px);opacity:0}}@-moz-keyframes bounceOutDown{0%{-moz-transform:translateY(0)}20%{-moz-transform:translateY(-100px);opacity:1}100%{-moz-transform:translateY(2000px);opacity:0}}@-o-keyframes bounceOutDown{0%{-o-transform:translateY(0)}20%{-o-transform:translateY(-100px);opacity:1}100%{-o-transform:translateY(2000px);opacity:0}}@keyframes bounceOutDown{0%{transform:translateY(0)}20%{transform:translateY(-100px);opacity:1}100%{transform:translateY(2000px);opacity:0}}.bounceOutDown{-webkit-animation-name:bounceOutDown;-moz-animation-name:bounceOutDown;-o-animation-name:bounceOutDown;animation-name:bounceOutDown}@-webkit-keyframes bounceOutLeft{0%{-webkit-transform:translateX(0)}20%{-webkit-transform:translateX(100px);opacity:1}100%{-webkit-transform:translateX(-2000px);opacity:0}}@-moz-keyframes bounceOutLeft{0%{-moz-transform:translateX(0)}20%{-moz-transform:translateX(100px);opacity:1}100%{-moz-transform:translateX(-2000px);opacity:0}}@-o-keyframes bounceOutLeft{0%{-o-transform:translateX(0)}20%{-o-transform:translateX(100px);opacity:1}100%{-o-transform:translateX(-2000px);opacity:0}}@keyframes bounceOutLeft{0%{transform:translateX(0)}20%{transform:translateX(100px);opacity:1}100%{transform:translateX(-2000px);opacity:0}}.bounceOutLeft{-webkit-animation-name:bounceOutLeft;-moz-animation-name:bounceOutLeft;-o-animation-name:bounceOutLeft;animation-name:bounceOutLeft}@-webkit-keyframes bounceOutRight{0%{-webkit-transform:translateX(0)}20%{-webkit-transform:translateX(-100px);opacity:1}100%{-webkit-transform:translateX(2000px);opacity:0}}@-moz-keyframes bounceOutRight{0%{-moz-transform:translateX(0)}20%{-moz-transform:translateX(-100px);opacity:1}100%{-moz-transform:translateX(2000px);opacity:0}}@-o-keyframes bounceOutRight{0%{-o-transform:translateX(0)}20%{-o-transform:translateX(-100px);opacity:1}100%{-o-transform:translateX(2000px);opacity:0}}@keyframes bounceOutRight{0%{transform:translateX(0)}20%{transform:translateX(-100px);opacity:1}100%{transform:translateX(2000px);opacity:0}}.bounceOutRight{-webkit-animation-name:bounceOutRight;-moz-animation-name:bounceOutRight;-o-animation-name:bounceOutRight;animation-name:bounceOutRight}@-webkit-keyframes rotateIn{0%{-webkit-transform:rotate(-200deg);-webkit-transform-origin:center center;opacity:0}100%{-webkit-transform:rotate(0);-webkit-transform-origin:center center;opacity:1}}@-moz-keyframes rotateIn{0%{-moz-transform:rotate(-200deg);-moz-transform-origin:center center;opacity:0}100%{-moz-transform:rotate(0);-moz-transform-origin:center center;opacity:1}}@-o-keyframes rotateIn{0%{-o-transform:rotate(-200deg);-o-transform-origin:center center;opacity:0}100%{-o-transform:rotate(0);-o-transform-origin:center center;opacity:1}}@keyframes rotateIn{0%{transform:rotate(-200deg);transform-origin:center center;opacity:0}100%{transform:rotate(0);transform-origin:center center;opacity:1}}.rotateIn{-webkit-animation-name:rotateIn;-moz-animation-name:rotateIn;-o-animation-name:rotateIn;animation-name:rotateIn}@-webkit-keyframes rotateInUpLeft{0%{-webkit-transform:rotate(90deg);-webkit-transform-origin:left bottom;opacity:0}100%{-webkit-transform:rotate(0);-webkit-transform-origin:left bottom;opacity:1}}@-moz-keyframes rotateInUpLeft{0%{-moz-transform:rotate(90deg);-moz-transform-origin:left bottom;opacity:0}100%{-moz-transform:rotate(0);-moz-transform-origin:left bottom;opacity:1}}@-o-keyframes rotateInUpLeft{0%{-o-transform:rotate(90deg);-o-transform-origin:left bottom;opacity:0}100%{-o-transform:rotate(0);-o-transform-origin:left bottom;opacity:1}}@keyframes rotateInUpLeft{0%{transform:rotate(90deg);transform-origin:left bottom;opacity:0}100%{transform:rotate(0);transform-origin:left bottom;opacity:1}}.rotateInUpLeft{-webkit-animation-name:rotateInUpLeft;-moz-animation-name:rotateInUpLeft;-o-animation-name:rotateInUpLeft;animation-name:rotateInUpLeft}@-webkit-keyframes rotateInDownLeft{0%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:left bottom;opacity:0}100%{-webkit-transform:rotate(0);-webkit-transform-origin:left bottom;opacity:1}}@-moz-keyframes rotateInDownLeft{0%{-moz-transform:rotate(-90deg);-moz-transform-origin:left bottom;opacity:0}100%{-moz-transform:rotate(0);-moz-transform-origin:left bottom;opacity:1}}@-o-keyframes rotateInDownLeft{0%{-o-transform:rotate(-90deg);-o-transform-origin:left bottom;opacity:0}100%{-o-transform:rotate(0);-o-transform-origin:left bottom;opacity:1}}@keyframes rotateInDownLeft{0%{transform:rotate(-90deg);transform-origin:left bottom;opacity:0}100%{transform:rotate(0);transform-origin:left bottom;opacity:1}}.rotateInDownLeft{-webkit-animation-name:rotateInDownLeft;-moz-animation-name:rotateInDownLeft;-o-animation-name:rotateInDownLeft;animation-name:rotateInDownLeft}@-webkit-keyframes rotateInUpRight{0%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:right bottom;opacity:0}100%{-webkit-transform:rotate(0);-webkit-transform-origin:right bottom;opacity:1}}@-moz-keyframes rotateInUpRight{0%{-moz-transform:rotate(-90deg);-moz-transform-origin:right bottom;opacity:0}100%{-moz-transform:rotate(0);-moz-transform-origin:right bottom;opacity:1}}@-o-keyframes rotateInUpRight{0%{-o-transform:rotate(-90deg);-o-transform-origin:right bottom;opacity:0}100%{-o-transform:rotate(0);-o-transform-origin:right bottom;opacity:1}}@keyframes rotateInUpRight{0%{transform:rotate(-90deg);transform-origin:right bottom;opacity:0}100%{transform:rotate(0);transform-origin:right bottom;opacity:1}}.rotateInUpRight{-webkit-animation-name:rotateInUpRight;-moz-animation-name:rotateInUpRight;-o-animation-name:rotateInUpRight;animation-name:rotateInUpRight}@-webkit-keyframes rotateInDownRight{0%{-webkit-transform:rotate(90deg);-webkit-transform-origin:right bottom;opacity:0}100%{-webkit-transform:rotate(0);-webkit-transform-origin:right bottom;opacity:1}}@-moz-keyframes rotateInDownRight{0%{-moz-transform:rotate(90deg);-moz-transform-origin:right bottom;opacity:0}100%{-moz-transform:rotate(0);-moz-transform-origin:right bottom;opacity:1}}@-o-keyframes rotateInDownRight{0%{-o-transform:rotate(90deg);-o-transform-origin:right bottom;opacity:0}100%{-o-transform:rotate(0);-o-transform-origin:right bottom;opacity:1}}@keyframes rotateInDownRight{0%{transform:rotate(90deg);transform-origin:right bottom;opacity:0}100%{transform:rotate(0);transform-origin:right bottom;opacity:1}}.rotateInDownRight{-webkit-animation-name:rotateInDownRight;-moz-animation-name:rotateInDownRight;-o-animation-name:rotateInDownRight;animation-name:rotateInDownRight}@-webkit-keyframes rotateOut{0%{-webkit-transform:rotate(0);-webkit-transform-origin:center center;opacity:1}100%{-webkit-transform:rotate(200deg);-webkit-transform-origin:center center;opacity:0}}@-moz-keyframes rotateOut{0%{-moz-transform:rotate(0);-moz-transform-origin:center center;opacity:1}100%{-moz-transform:rotate(200deg);-moz-transform-origin:center center;opacity:0}}@-o-keyframes rotateOut{0%{-o-transform:rotate(0);-o-transform-origin:center center;opacity:1}100%{-o-transform:rotate(200deg);-o-transform-origin:center center;opacity:0}}@keyframes rotateOut{0%{transform:rotate(0);transform-origin:center center;opacity:1}100%{transform:rotate(200deg);transform-origin:center center;opacity:0}}.rotateOut{-webkit-animation-name:rotateOut;-moz-animation-name:rotateOut;-o-animation-name:rotateOut;animation-name:rotateOut}@-webkit-keyframes rotateOutUpLeft{0%{-webkit-transform:rotate(0);-webkit-transform-origin:left bottom;opacity:1}100%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:left bottom;opacity:0}}@-moz-keyframes rotateOutUpLeft{0%{-moz-transform:rotate(0);-moz-transform-origin:left bottom;opacity:1}100%{-moz-transform:rotate(-90deg);-moz-transform-origin:left bottom;opacity:0}}@-o-keyframes rotateOutUpLeft{0%{-o-transform:rotate(0);-o-transform-origin:left bottom;opacity:1}100%{-o-transform:rotate(-90deg);-o-transform-origin:left bottom;opacity:0}}@keyframes rotateOutUpLeft{0%{transform:rotate(0);transform-origin:left bottom;opacity:1}100%{opacity:0;-transform:rotate(-90deg);-transform-origin:left bottom}}.rotateOutUpLeft{-webkit-animation-name:rotateOutUpLeft;-moz-animation-name:rotateOutUpLeft;-o-animation-name:rotateOutUpLeft;animation-name:rotateOutUpLeft}@-webkit-keyframes rotateOutDownLeft{0%{-webkit-transform:rotate(0);-webkit-transform-origin:left bottom;opacity:1}100%{-webkit-transform:rotate(90deg);-webkit-transform-origin:left bottom;opacity:0}}@-moz-keyframes rotateOutDownLeft{0%{-moz-transform:rotate(0);-moz-transform-origin:left bottom;opacity:1}100%{-moz-transform:rotate(90deg);-moz-transform-origin:left bottom;opacity:0}}@-o-keyframes rotateOutDownLeft{0%{-o-transform:rotate(0);-o-transform-origin:left bottom;opacity:1}100%{-o-transform:rotate(90deg);-o-transform-origin:left bottom;opacity:0}}@keyframes rotateOutDownLeft{0%{transform:rotate(0);transform-origin:left bottom;opacity:1}100%{transform:rotate(90deg);transform-origin:left bottom;opacity:0}}.rotateOutDownLeft{-webkit-animation-name:rotateOutDownLeft;-moz-animation-name:rotateOutDownLeft;-o-animation-name:rotateOutDownLeft;animation-name:rotateOutDownLeft}@-webkit-keyframes rotateOutUpRight{0%{-webkit-transform:rotate(0);-webkit-transform-origin:right bottom;opacity:1}100%{-webkit-transform:rotate(90deg);-webkit-transform-origin:right bottom;opacity:0}}@-moz-keyframes rotateOutUpRight{0%{-moz-transform:rotate(0);-moz-transform-origin:right bottom;opacity:1}100%{-moz-transform:rotate(90deg);-moz-transform-origin:right bottom;opacity:0}}@-o-keyframes rotateOutUpRight{0%{-o-transform:rotate(0);-o-transform-origin:right bottom;opacity:1}100%{-o-transform:rotate(90deg);-o-transform-origin:right bottom;opacity:0}}@keyframes rotateOutUpRight{0%{transform:rotate(0);transform-origin:right bottom;opacity:1}100%{transform:rotate(90deg);transform-origin:right bottom;opacity:0}}.rotateOutUpRight{-webkit-animation-name:rotateOutUpRight;-moz-animation-name:rotateOutUpRight;-o-animation-name:rotateOutUpRight;animation-name:rotateOutUpRight}@-webkit-keyframes rotateOutDownRight{0%{-webkit-transform:rotate(0);-webkit-transform-origin:right bottom;opacity:1}100%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:right bottom;opacity:0}}@-moz-keyframes rotateOutDownRight{0%{-moz-transform:rotate(0);-moz-transform-origin:right bottom;opacity:1}100%{-moz-transform:rotate(-90deg);-moz-transform-origin:right bottom;opacity:0}}@-o-keyframes rotateOutDownRight{0%{-o-transform:rotate(0);-o-transform-origin:right bottom;opacity:1}100%{-o-transform:rotate(-90deg);-o-transform-origin:right bottom;opacity:0}}@keyframes rotateOutDownRight{0%{transform:rotate(0);transform-origin:right bottom;opacity:1}100%{transform:rotate(-90deg);transform-origin:right bottom;opacity:0}}.rotateOutDownRight{-webkit-animation-name:rotateOutDownRight;-moz-animation-name:rotateOutDownRight;-o-animation-name:rotateOutDownRight;animation-name:rotateOutDownRight}@-webkit-keyframes hinge{0%{-webkit-transform:rotate(0);-webkit-transform-origin:top left;-webkit-animation-timing-function:ease-in-out}20%,60%{-webkit-transform:rotate(80deg);-webkit-transform-origin:top left;-webkit-animation-timing-function:ease-in-out}40%{-webkit-transform:rotate(60deg);-webkit-transform-origin:top left;-webkit-animation-timing-function:ease-in-out}80%{-webkit-transform:rotate(60deg) translateY(0);-webkit-transform-origin:top left;-webkit-animation-timing-function:ease-in-out;opacity:1}100%{-webkit-transform:translateY(700px);opacity:0}}@-moz-keyframes hinge{0%{-moz-transform:rotate(0);-moz-transform-origin:top left;-moz-animation-timing-function:ease-in-out}20%,60%{-moz-transform:rotate(80deg);-moz-transform-origin:top left;-moz-animation-timing-function:ease-in-out}40%{-moz-transform:rotate(60deg);-moz-transform-origin:top left;-moz-animation-timing-function:ease-in-out}80%{-moz-transform:rotate(60deg) translateY(0);-moz-transform-origin:top left;-moz-animation-timing-function:ease-in-out;opacity:1}100%{-moz-transform:translateY(700px);opacity:0}}@-o-keyframes hinge{0%{-o-transform:rotate(0);-o-transform-origin:top left;-o-animation-timing-function:ease-in-out}20%,60%{-o-transform:rotate(80deg);-o-transform-origin:top left;-o-animation-timing-function:ease-in-out}40%{-o-transform:rotate(60deg);-o-transform-origin:top left;-o-animation-timing-function:ease-in-out}80%{-o-transform:rotate(60deg) translateY(0);-o-transform-origin:top left;-o-animation-timing-function:ease-in-out;opacity:1}100%{-o-transform:translateY(700px);opacity:0}}@keyframes hinge{0%{transform:rotate(0);transform-origin:top left;animation-timing-function:ease-in-out}20%,60%{transform:rotate(80deg);transform-origin:top left;animation-timing-function:ease-in-out}40%{transform:rotate(60deg);transform-origin:top left;animation-timing-function:ease-in-out}80%{transform:rotate(60deg) translateY(0);transform-origin:top left;animation-timing-function:ease-in-out;opacity:1}100%{transform:translateY(700px);opacity:0}}.hinge{-webkit-animation-name:hinge;-moz-animation-name:hinge;-o-animation-name:hinge;animation-name:hinge}@-webkit-keyframes rollIn{0%{-webkit-transform:translateX(-500px) rotate(-200deg);opacity:0}100%{-webkit-transform:translateX(0) rotate(0deg);opacity:1}}@-moz-keyframes rollIn{0%{-moz-transform:translateX(-500px) rotate(-200deg);opacity:0}100%{-moz-transform:translateX(0) rotate(0deg);opacity:1}}@-o-keyframes rollIn{0%{-o-transform:translateX(-500px) rotate(-200deg);opacity:0}100%{-o-transform:translateX(0) rotate(0deg);opacity:1}}@keyframes rollIn{0%{transform:translateX(-500px) rotate(-200deg);opacity:0}100%{transform:translateX(0) rotate(0deg);opacity:1}}.rollIn{-webkit-animation-name:rollIn;-moz-animation-name:rollIn;-o-animation-name:rollIn;animation-name:rollIn}@-webkit-keyframes rollOut{0%{-webkit-transform:translateX(0) rotate(0deg);opacity:1}100%{-webkit-transform:translateX(500px) rotate(200deg);opacity:0}}@-moz-keyframes rollOut{0%{-moz-transform:translateX(0) rotate(0deg);opacity:1}100%{-moz-transform:translateX(500px) rotate(200deg);opacity:0}}@-o-keyframes rollOut{0%{-o-transform:translateX(0) rotate(0deg);opacity:1}100%{-o-transform:translateX(500px) rotate(200deg);opacity:0}}@keyframes rollOut{0%{transform:translateX(0) rotate(0deg);opacity:1}100%{transform:translateX(500px) rotate(200deg);opacity:0}}.rollOut{-webkit-animation-name:rollOut;-moz-animation-name:rollOut;-o-animation-name:rollOut;animation-name:rollOut}@-webkit-keyframes lightSpeedIn{0%{-webkit-transform:translateX(100%) skewX(-30deg);opacity:0}60%{-webkit-transform:translateX(-20%) skewX(30deg);opacity:1}80%{-webkit-transform:translateX(0) skewX(-15deg);opacity:1}100%{-webkit-transform:translateX(0) skewX(0deg);opacity:1}}@-moz-keyframes lightSpeedIn{0%{-moz-transform:translateX(100%) skewX(-30deg);opacity:0}60%{-moz-transform:translateX(-20%) skewX(30deg);opacity:1}80%{-moz-transform:translateX(0) skewX(-15deg);opacity:1}100%{-moz-transform:translateX(0) skewX(0deg);opacity:1}}@-o-keyframes lightSpeedIn{0%{-o-transform:translateX(100%) skewX(-30deg);opacity:0}60%{-o-transform:translateX(-20%) skewX(30deg);opacity:1}80%{-o-transform:translateX(0) skewX(-15deg);opacity:1}100%{-o-transform:translateX(0) skewX(0deg);opacity:1}}@keyframes lightSpeedIn{0%{transform:translateX(100%) skewX(-30deg);opacity:0}60%{transform:translateX(-20%) skewX(30deg);opacity:1}80%{transform:translateX(0) skewX(-15deg);opacity:1}100%{transform:translateX(0) skewX(0deg);opacity:1}}.lightSpeedIn{-webkit-animation-name:lightSpeedIn;-moz-animation-name:lightSpeedIn;-o-animation-name:lightSpeedIn;animation-name:lightSpeedIn;-webkit-animation-timing-function:ease-out;-moz-animation-timing-function:ease-out;-o-animation-timing-function:ease-out;animation-timing-function:ease-out}.animated.lightSpeedIn{-webkit-animation-duration:.5s;-moz-animation-duration:.5s;-o-animation-duration:.5s;animation-duration:.5s}@-webkit-keyframes lightSpeedOut{0%{-webkit-transform:translateX(0) skewX(0deg);opacity:1}100%{-webkit-transform:translateX(100%) skewX(-30deg);opacity:0}}@-moz-keyframes lightSpeedOut{0%{-moz-transform:translateX(0) skewX(0deg);opacity:1}100%{-moz-transform:translateX(100%) skewX(-30deg);opacity:0}}@-o-keyframes lightSpeedOut{0%{-o-transform:translateX(0) skewX(0deg);opacity:1}100%{-o-transform:translateX(100%) skewX(-30deg);opacity:0}}@keyframes lightSpeedOut{0%{transform:translateX(0) skewX(0deg);opacity:1}100%{transform:translateX(100%) skewX(-30deg);opacity:0}}.lightSpeedOut{-webkit-animation-name:lightSpeedOut;-moz-animation-name:lightSpeedOut;-o-animation-name:lightSpeedOut;animation-name:lightSpeedOut;-webkit-animation-timing-function:ease-in;-moz-animation-timing-function:ease-in;-o-animation-timing-function:ease-in;animation-timing-function:ease-in}.animated.lightSpeedOut{-webkit-animation-duration:.25s;-moz-animation-duration:.25s;-o-animation-duration:.25s;animation-duration:.25s}@-webkit-keyframes wiggle{0%{-webkit-transform:skewX(9deg)}10%{-webkit-transform:skewX(-8deg)}20%{-webkit-transform:skewX(7deg)}30%{-webkit-transform:skewX(-6deg)}40%{-webkit-transform:skewX(5deg)}50%{-webkit-transform:skewX(-4deg)}60%{-webkit-transform:skewX(3deg)}70%{-webkit-transform:skewX(-2deg)}80%{-webkit-transform:skewX(1deg)}100%,90%{-webkit-transform:skewX(0deg)}}@-moz-keyframes wiggle{0%{-moz-transform:skewX(9deg)}10%{-moz-transform:skewX(-8deg)}20%{-moz-transform:skewX(7deg)}30%{-moz-transform:skewX(-6deg)}40%{-moz-transform:skewX(5deg)}50%{-moz-transform:skewX(-4deg)}60%{-moz-transform:skewX(3deg)}70%{-moz-transform:skewX(-2deg)}80%{-moz-transform:skewX(1deg)}100%,90%{-moz-transform:skewX(0deg)}}@-o-keyframes wiggle{0%{-o-transform:skewX(9deg)}10%{-o-transform:skewX(-8deg)}20%{-o-transform:skewX(7deg)}30%{-o-transform:skewX(-6deg)}40%{-o-transform:skewX(5deg)}50%{-o-transform:skewX(-4deg)}60%{-o-transform:skewX(3deg)}70%{-o-transform:skewX(-2deg)}80%{-o-transform:skewX(1deg)}100%,90%{-o-transform:skewX(0deg)}}@keyframes wiggle{0%{transform:skewX(9deg)}10%{transform:skewX(-8deg)}20%{transform:skewX(7deg)}30%{transform:skewX(-6deg)}40%{transform:skewX(5deg)}50%{transform:skewX(-4deg)}60%{transform:skewX(3deg)}70%{transform:skewX(-2deg)}80%{transform:skewX(1deg)}100%,90%{transform:skewX(0deg)}}.wiggle{-webkit-animation-name:wiggle;-moz-animation-name:wiggle;-o-animation-name:wiggle;animation-name:wiggle;-webkit-animation-timing-function:ease-in;-moz-animation-timing-function:ease-in;-o-animation-timing-function:ease-in;animation-timing-function:ease-in}.animated.wiggle{-webkit-animation-duration:.75s;-moz-animation-duration:.75s;-o-animation-duration:.75s;animation-duration:.75s}</style></head>
+<body>
+	<div style="position:absolute;left:-999999px;">
+		<h1>基于Token的CSRF防御绕过</h1>
+		<p></p>
+		
+		<p></p>
+		
+			<a>nonono</a>
+		
+		
+			
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+					</div>
+				
+					<div>
+						
+					</div>
+				
+					<div>
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+					</div>
+				
+					<div>
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+						
+							
+						
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+					<div>
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+							
+								<p></p>
+							
+						
+					</div>
+				
+			
+		
+	</div>
+	
+	<div id="wrapper">
+		<div id="workSpace" class="pos"></div>
+		<div id="background" class="pos"></div>
+	</div>
+
+	<div class="none" id="view_toPrev" title="上一张">‹</div>
+	<div class="none" id="view_toNext" title="下一张">›</div>
+
+	<!--播放进度条-->
+	<div id="viewProgress">
+		<div id="progressLoaded"></div>
+		<div id="progressBlocks"></div>
+	</div>
+
+	<div id="hintText" class="none"></div>
+
+	<div id="viewCenter" class="none">
+		<div id="viewCenterAngle"></div>
+		<ul id="viewCenterBtns" class="clearfix">
+			<li id="autoPlayItem">
+				<a class="btnFn mr5 fl" id="view_autoPlay" title="自动播放">
+					<span class="iconPlay"></span>
+					<input id="autoPlayTime" type="text" title="自动播放时间" />
+				</a>
+			</li>
+			<li class="pr">
+				<a class="btnFn mr5" id="view_playMode" title="播放模式"><span class="iconPlayMode"></span></a>
+				<ul id="playModeMenu" class="dropdownMenu">
+					<li class="topArrow"></li>
+					<!-- <li><a class="btnMode" href="javascript:;" id="mode_standard">经典模式</a></li>
+					<li><a class="btnMode" href="javascript:;" id="mode_magic">镜头模式</a></li>
+					<li><a class="btnMode" href="javascript:;" id="mode_flip">看图模式</a></li>
+					<li><a class="btnMode" href="javascript:;" id="mode_blur">虚化模式</a></li> -->
+					<li class="divider"></li>
+					<li><a href="http://www.ipresst.com/w/w65q4a" target="_blank">作品详情</a></li>
+					<li><a href="http://www.ipresst.com/u/nonono" target="_blank">作者主页</a></li>
+				</ul>
+			</li>
+			<li><a class="btnFn disabled" title="无背景音乐" id="view_bgSound"><span class="iconMusic"></span></a></li>
+			<li><a class="btnFn disabled jiathis jiathis_txt jtico jtico_jiathis" title="分享功能暂时不可用" id="view_share"><span class="iconShare"></span></a></li>
+			<li><a class="btnFn" title="全屏" id="view_fullScreen"><span class="iconFullScreen"></span></a></li>
+		</ul>
+	</div>
+
+	<!-- 播放结束弹窗 -->
+	<div id="afterView" class="none">
+		<div id="afterViewBtns" class="clearfix">
+			<a id="view_toFirst" href="#step=1"><span class="iconToFirst"></span>重播</a>
+			<a id="view_share_b" class="jiathis jiathis_txt jtico jtico_jiathis disabled" href="javascript:;"><span class="iconShareBig"></span>分享</a>
+			<a href="http://www.ipresst.com/w/w65q4a" id="view_comment" target="_blank"><span class="iconComment"></span>评论</a>
+		</div>
+		<div id="afterViewAbout" class="link">
+			<a href="http://www.ipresst.com/w/w65q4a" target="_blank">作品详情</a>
+			<a href="http://www.ipresst.com/u/nonono" target="_blank">作者主页</a>
+			<a id="btnSite" href="http://www.ipresst.com" target="_blank">官方网站</a>
+			<a class="last" id="btnAbout" href="javascript:;" target="_blank">关于</a>
+		</div>
+		<a class="btnClose" title="关闭" href="javascript:;">&times;</a>
+	</div>
+
+	<!--关于-->
+	<div id="aboutBox" class="about">
+		<a id="aboutCloseBtn" href="###">&times;</a>
+		<img id="iPresstLogo" src="img/logo.ipresst.bigicon.png" alt="iPresst Logo" title="iPresst Logo" />
+		<div id="aboutBoxMain">
+			<p id="iPresstText">iPresst</p>
+			<p id="aboutVersion">版本：1.0</p>
+			<p id="aboutCopyright">Copyright &copy; <script>document.write(new Date().getFullYear());</script> <a href="http://www.ipresst.com/" target="_blank">iPresst.com</a>. All Rights Reserved.</p>
+			<p id="aboutCredits">创作者：TAT.Aishen, TAT.CG, TAT.DM, TAT.Jarvis, TAT.Kinvix, TAT.Weber, TAT.Yussica</p>
+		</div>
+	</div>
+
+	<a id="logo" class="none" href="http://www.ipresst.com" target="_blank" title="iPresst - 简约随性的创作发布平台">
+		<img id="logoImg" src="img/logo.ipresst.text2.png" />
+	</a>
+	<script type="text/javascript">
+	var isExport = true;
+	var workdata = {"_id":"558827759f4fa8d60e20896a","title":"基于Token的CSRF防御绕过","master":"nonono","authors":["nonono"],"doc":{"counter":303,"frame":{"e1":{"children":{"e2":{"property":{"scale":1,"translateX":-98.5,"type":"text","width":911,"zIndex":1,"height":114,"padding":"5px","rotate":0,"text":"<p style=\"text-align: center; margin-bottom: 12px; margin-top: 22px;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 77px; line-height: 45px;\">Token型CSRF漏洞的绕过</span></span></p>","translateY":-63}},"e3":{"property":{"zIndex":2,"scale":1,"translateX":189.5,"type":"text","width":307,"translateY":39.5,"height":69,"padding":"5px","rotate":0,"text":"<p style=\"margin-top: 9px;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 37px; line-height: 45px;\">TSRC西安沙龙</span></span></p>"}}},"property":{"height":900,"rotate":0,"scale":1,"translateX":0,"translateY":0,"type":"frame","width":1440,"zIndex":1}},"e10":{"children":{"e15":{"property":{"text":"<p style=\"line-height: 1.5; text-align: center;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 78px;\">VS</span></p>","translateY":-4,"height":156,"padding":"5px","rotate":0,"width":167,"zIndex":1,"scale":1,"translateX":-275.5,"type":"text"}},"e88":{"property":{"width":319,"zIndex":2,"scale":1,"translateX":378.5,"type":"text","text":"<p style=\"line-height: 1.9;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 38px;\">◆ 验证码</span></p><p style=\"line-height: 1.9;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 38px;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 38px; line-height: 72px; \">◆ Referer检查</span></span></p><p style=\"line-height: 1.9;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 38px; color: rgb(255, 0, 0);\">◆ Token检查</span></p>","translateY":-4,"height":356,"padding":"5px","rotate":0}},"e132":{"property":{"type":"text","padding":"5px","width":396,"height":185,"text":"<p style=\";\"><strong><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 43px; line-height: 45px; color: rgb(255, 0, 0); background-color: rgba(255, 255, 255, 0);\">常用CSRF防御手段</span></strong></p>","rotate":0,"scale":1,"translateX":310,"translateY":-270.5,"zIndex":3}},"e134":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-268.5,"translateY":-229.5,"zIndex":4,"width":529,"realWidth":347,"height":285,"realHeight":187,"src":"resource/788b8eba99ec5f55ad58607f9816fe8f8cbce026.gif"}},"e135":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-268,"translateY":191,"zIndex":5,"width":660,"realWidth":660,"height":280,"realHeight":280,"src":"resource/9329a3023a16ed8c3b6296b0de7ad9a712015a82.jpeg"}}},"property":{"rotate":0,"scale":1,"translateX":-1560,"translateY":1020,"type":"frame","width":1440,"zIndex":4,"height":900}},"e22":{"children":{"e25":{"property":{"rotate":0,"text":"<p><strong><span style=\"font-size: 60px; font-family: &#39;Calibri Light&#39;;\">如何获取受害者的Token？</span></strong></p>","translateY":-303.5,"height":71,"padding":"5px","type":"text","width":860,"zIndex":2,"scale":1,"translateX":-205}},"e29":{"property":{"scale":1,"translateX":-135,"type":"text","width":600,"zIndex":3,"height":200,"padding":"5px","rotate":0,"text":"<p style=\"line-height: 1.5; text-align: center;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 100px; color: rgb(255, 0, 0);\">跨域</span></p>","translateY":39}},"e143":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-135,"translateY":77,"zIndex":1,"width":1010,"realWidth":450,"height":584,"realHeight":260,"src":"resource/417070801c8466eb943c0a443b67ea54a15fa3da.png"}}},"property":{"scale":1,"translateX":-3120,"translateY":1020,"type":"frame","width":1440,"zIndex":6,"height":900,"rotate":0},"animate":{"frameID":"e22","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e143","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e29","delay":"0s","duration":"1s","type":0,"index":1}]}},"e75":{"children":{"e76":{"property":{"width":600,"zIndex":1,"scale":1,"translateX":-302,"type":"text","text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 120px;\">Q&amp;A</span></p>","translateY":-252,"height":200,"padding":"5px","rotate":0}},"e78":{"property":{"scale":1,"translateX":-256,"type":"text","width":692,"zIndex":2,"height":245,"padding":"5px","rotate":0,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 1.5;\">phithon</span></p><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 1.5;\">邮箱&nbsp;&nbsp;&nbsp;&nbsp;root@leavesongs.com</span><br/></p><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">博客&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"https://www.leavesongs.com/\" _src=\"https://www.leavesongs.com/\">https://www.leavesongs.com/</a></span></p><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">乌云&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://wooyun.org/whitehats/phith0n\" _src=\"http://wooyun.org/whitehats/phith0n\">http://wooyun.org/whitehats/phith0n</a> </span></p><p style=\"line-height:1.5;\"><br/></p>","translateY":-19.5}}},"property":{"scale":1,"translateX":-8640,"translateY":-2156,"type":"frame","width":1440,"zIndex":11,"height":900,"rotate":0}},"e16":{"animate":{"frameID":"e16","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e136","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e139","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e138","delay":"0s","duration":"1s","type":0,"index":2}]},"children":{"e36":{"property":{"height":73,"padding":"5px","rotate":0,"text":"<p><span style=\"font-family:Calibri Light\"><span style=\"font-size: 60px;\">Token在哪里</span></span></p>","translateY":-302.5,"scale":1,"translateX":-412.5,"type":"text","width":445,"zIndex":1}},"e136":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-96,"translateY":55.5,"zIndex":2,"width":1088,"realWidth":1372,"height":601,"realHeight":758,"src":"resource/af306d4cba4697b9fd5629e044100eef9e7db05f.png"}},"e138":{"property":{"type":"image","rotate":0,"scale":1,"translateX":41.5,"translateY":195.5,"zIndex":4,"width":1083,"realWidth":1658,"height":399,"realHeight":612,"src":"resource/ed95fccc8769aa38936d794fb6e49506158fd8de.png"}},"e139":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-12,"translateY":42.5,"zIndex":3,"width":1122,"realWidth":1868,"height":403,"realHeight":670,"src":"resource/6038ac1f234d4ab0e02e2b60841a1367a76dfbb0.png"}}},"property":{"rotate":0,"scale":1,"translateX":-1560,"translateY":0,"type":"frame","width":1440,"zIndex":5,"height":900}},"e30":{"property":{"translateY":0,"type":"frame","width":1440,"zIndex":7,"height":900,"rotate":0,"scale":1,"translateX":-3120},"children":{"e32":{"property":{"rotate":0,"text":"<p style=\"text-align: center;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 45px; line-height: 67.5px;\">例子1、新浪股吧jsonp劫持导致的CSRF蠕虫</span></span></p>","translateY":-319,"height":136,"padding":"5px","type":"text","width":966,"zIndex":1,"scale":1,"translateX":-160}},"e147":{"property":{"type":"text","padding":"5px","width":1246,"height":689,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\">jsonp：将json格式字符串用javascript函数包裹，使其可以被script引用</span><br/></p><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\"><br/></span></p><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\">Domain A:</span></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;  color: rgb(255, 0, 0);\">callback</span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">&nbsp;( {token: &quot;</span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;  color: rgb(12, 0, 255);\">e10adc3949ba59abbe56e057f20f883e</span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">&quot;} )&nbsp;</span></span></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \"><br/></span></span></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">Domain B:</span></span></p><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\">&lt;script&gt;</span><br/></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\">&nbsp;&nbsp;&nbsp;&nbsp;function callback(data){ console.log(<span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; color: rgb(30, 0, 255);\">data.token</span>) }</span></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\">&lt;/script&gt;</span></p><p><span style=\"font-size: 30px; line-height: 45px; font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">&lt;script src=</span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;  color: rgb(255, 0, 0);\">http://a.com/jsonp.php?callback=callback</span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; \">&gt;&lt;/script&gt;</span></span></p>","rotate":0,"scale":1,"translateX":17,"translateY":58.5,"zIndex":2}}}},"e52":{"children":{"e53":{"property":{"rotate":0,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 60px;\"><span style=\"font-size: 45px;\">例2、fanwe o2o商业系统jsonp劫持用户信息</span></span></span></p>","translateY":-335.5,"height":79,"padding":"5px","type":"text","width":1294,"zIndex":1,"scale":1,"translateX":-16}},"e171":{"property":{"type":"image","rotate":0,"scale":1,"translateX":361,"translateY":-66,"zIndex":2,"width":550,"realWidth":550,"height":450,"realHeight":450,"src":"resource/b598b4167ab3febf60e7533d0cb4b556847240b0.jpeg"}},"e172":{"property":{"type":"text","padding":"5px","width":742,"height":60,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">开源应用中的jsonp劫持案例（少？why？）</span></span></p>","rotate":0,"scale":1,"translateX":-292,"translateY":-236,"zIndex":3}},"e173":{"property":{"type":"text","padding":"5px","width":503,"height":69,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">如何在源码中挖掘jsonp劫持漏洞？</span></span></p>","rotate":0,"scale":1,"translateX":-411.5,"translateY":-171.5,"zIndex":4}},"e174":{"property":{"type":"text","padding":"5px","width":364,"height":106,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">案例：方维O2O商业系统</span></font></p>","rotate":0,"scale":1,"translateX":-479,"translateY":-87,"zIndex":5}},"e175":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-294.5,"translateY":163,"zIndex":6,"width":747,"realWidth":1432,"height":500,"realHeight":960,"src":"resource/693af8c8595437112fcd98210626f2ceaccc0077.png"}}},"property":{"height":900,"rotate":0,"scale":1,"translateX":-3120,"translateY":-2040,"type":"frame","width":1440,"zIndex":10},"animate":{"frameID":"e52","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e172","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e173","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e171","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e174","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e175","delay":"0s","duration":"1s","type":0,"index":4}]}},"e37":{"children":{"e38":{"property":{"height":90,"padding":"5px","rotate":0,"text":"<p style=\"text-align: center;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; text-align: center; \">例子1、新浪股吧jsonp劫持导致的CSRF蠕虫</span></p>","translateY":-343,"scale":1,"translateX":-207,"type":"text","width":902,"zIndex":1}},"e150":{"property":{"type":"image","rotate":0,"scale":1,"translateX":8.5,"translateY":-72,"zIndex":2,"width":1343,"realWidth":2518,"height":272,"realHeight":510,"src":"resource/2e5c873e3414eda5339a761303a2197cb48f6c94.png"}},"e151":{"property":{"type":"text","padding":"5px","width":353,"height":42,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">直接访问是json格式</span></span></p>","rotate":0,"scale":1,"translateX":-481.5,"translateY":-234,"zIndex":3}},"e152":{"property":{"type":"text","padding":"5px","width":586,"height":59,"text":"<p><font color=\"#ff0000\" face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">增加callback=hehe</span></font></p>","rotate":0,"scale":1,"translateX":-365,"translateY":133.5,"zIndex":4}},"e153":{"property":{"type":"image","rotate":0,"scale":1,"translateX":9.5,"translateY":290.5,"zIndex":5,"width":1345,"realWidth":2520,"height":265,"realHeight":498,"src":"resource/57018783c57d9b7523030277ca19107fc5db77f7.png"}}},"property":{"rotate":0,"scale":1,"translateX":-1560,"translateY":-1020,"type":"frame","width":1440,"zIndex":8,"height":900},"animate":{"frameID":"e37","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e151","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e150","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e152","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e153","delay":"0s","duration":"1s","type":0,"index":3}]}},"e4":{"property":{"translateY":141,"type":"frame","width":1440,"zIndex":2,"height":900,"rotate":0,"scale":0.3130595327072382,"translateX":563},"children":{"e5":{"property":{"zIndex":1,"scale":1,"translateX":-298,"type":"text","width":644,"translateY":-209.5,"height":361,"padding":"5px","rotate":0,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 111px; line-height: 166.5px;\">phithon</span></font></p><p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 80px; line-height: 80px;\">西安电子科技大学</span></font></p>"}},"e6":{"property":{"scale":1,"translateX":-320,"type":"text","width":600,"zIndex":2,"height":213,"padding":"5px","rotate":0,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 48px;\">乌云核心白帽子</span></span></p><p style=\"line-height: 1.6;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px;\">XDSEC团队成员<br/></span></span></p><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 48px;\">擅长代码审计，目前从事前端安全 / 运维安全 / 新web应用安全研究</span></span></p>","translateY":47.5}},"e100":{"property":{"type":"image","rotate":0,"scale":1,"translateX":394,"translateY":-96.5,"zIndex":3,"width":468,"realWidth":200,"height":465,"realHeight":199,"src":"resource/fb866046273fbf8e7df12402a8799862a50c9a74.jpeg","border-radius":"251px ","border":"10px solid rgb(250, 212, 212) ","padding":"0px "}}}},"e46":{"property":{"translateX":-3120,"translateY":-1020,"type":"frame","width":1440,"zIndex":9,"height":900,"rotate":0,"scale":1},"children":{"e47":{"property":{"padding":"5px","rotate":0,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; text-align: center; \">例子1、新浪股吧jsonp劫持导致的CSRF蠕虫</span></p>","translateY":-343,"height":78,"translateX":-135.5,"type":"text","width":1005,"zIndex":1,"scale":1}},"e154":{"property":{"type":"text","padding":"5px","width":448,"height":53,"text":"<p><font color=\"#ff0000\" face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">POST -&gt; GET</span></font></p>","rotate":0,"scale":1,"translateX":-414,"translateY":-251.5,"zIndex":2}},"e156":{"property":{"type":"image","rotate":0,"scale":1,"translateX":9,"translateY":-96,"zIndex":3,"width":1304,"realWidth":2518,"height":248,"realHeight":478,"src":"resource/ece3f2818a3e161be4654bc86d5b71e741411dde.png"}},"e157":{"property":{"type":"text","padding":"5px","width":440,"height":69,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">“缺少参数：吧id或吧名称”</span></span></p>","rotate":0,"scale":1,"translateX":-418,"translateY":312.5,"zIndex":5}},"e158":{"property":{"type":"image","rotate":0,"scale":1,"translateX":8,"translateY":184,"zIndex":4,"width":1302,"realWidth":2530,"height":312,"realHeight":606,"src":"resource/5a710f2d523724c6a3671e8adcd4e9ef0d97d311.png"}},"e159":{"property":{"type":"shape","param":{"shape":{"svgData":"M 1,15 30,15 30,5 39,20 30,35 30,25 1,25 Z","controls":[{"id":"svg_cp_14358913790010","x":30.08425886855037,"y":18.40010895717729,"bindPoint":1,"type":"drag","linkPoint":[{"index":1,"func":"x"},{"index":2,"func":"x"},{"index":4,"func":"x"},{"index":5,"func":"x"},{"index":0,"func":"y"},{"index":1,"func":"y"},{"index":5,"func":"-y"},{"index":6,"func":"-y"}]}],"type":"svg_shape","style":{"width":640,"height":257,"stroke":"rgb(255, 0, 0)","fill":"rgba(0,0,0,0)","stroke-width":"2px"},"segData":{"0":{"x":1,"y":18.400108957177288},"1":{"x":30.084258868550375,"y":18.400108957177288},"2":{"x":30.084258868550375,"y":5},"3":{"x":39,"y":20},"4":{"x":30.084258868550375,"y":35},"5":{"x":30.084258868550375,"y":21.599891042822712},"6":{"x":1,"y":21.599891042822712},"7":{}}},"width":640,"height":257,"stroke":"rgb(255, 0, 0)"},"width":640,"height":257,"rotate":155.000957,"scale":1,"translateX":34,"translateY":138.5,"zIndex":6,"border":"0px none rgb(255, 255, 255) "}}},"animate":{"frameID":"e46","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e154","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e156","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e158","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e159","delay":"0s","duration":"2s","type":0,"index":3},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e157","delay":"0s","duration":"1s","type":0,"index":4}]}},"e8":{"children":{"e129":{"property":{"type":"text","padding":"5px","width":369,"height":122,"text":"<p style=\"line-height:1.5;\"><strong><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px;\">什么是CSRF漏洞</span></strong></p>","rotate":0,"scale":1,"translateX":511.5,"translateY":-191,"zIndex":1}},"e130":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-188.5,"translateY":55.5,"zIndex":2,"width":955,"realWidth":1012,"height":625,"realHeight":662,"src":"resource/8574e3bb79a1e409aa5e8b74e6f15d67d977a57e.png"}}},"property":{"translateY":1020,"type":"frame","width":1440,"zIndex":3,"height":900,"rotate":0,"scale":1,"translateX":0}},"e82":{"children":{"e83":{"property":{"height":76,"padding":"5px","rotate":0,"text":"<p><font face=\"Calibri Light\"><span style=\"font-size: 60px;\">例1、总结</span></font></p>","translateY":-301,"scale":1,"translateX":-332.5,"type":"text","width":605,"zIndex":1}},"e168":{"property":{"type":"text","padding":"5px","width":1186,"height":298,"text":"<ul class=\" list-paddingleft-2\" style=\"width: 1162px; white-space: normal;\"><li><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-size: 30px; line-height: 45px;\">目标网站开发习惯：sina几乎所有jsonp回调函数参数名都是callback</span></span></p></li><li><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-size: 30px; line-height: 45px;\">开发人员误区与惯性思维：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">框架的习惯性滥用*</span></span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">仔细观察数据包里的每一个字</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">理解开发人员的思维：参数命名法、函数命名习惯</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">熟练使用各类抓包工具</span></span></p></li></ul><p style=\"line-height:1.5;\"><br/></p>","rotate":0,"scale":1,"translateX":-39,"translateY":-90,"zIndex":2}},"e169":{"property":{"type":"image","rotate":0,"scale":1,"translateX":446.5,"translateY":101,"zIndex":3,"width":401,"realWidth":500,"height":536,"realHeight":669,"src":"resource/cb3013568c94fd6d0740d060220837faab70d867.jpeg"}},"e170":{"property":{"type":"text","padding":"5px","width":350,"height":71,"text":"<p style=\"\"><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">从开发者的角度看问题</span></font></p>","rotate":0,"scale":1,"translateX":66,"translateY":201.5,"zIndex":4}}},"property":{"height":900,"rotate":0,"scale":1,"translateX":-5759,"translateY":-2610,"type":"frame","width":1440,"zIndex":12},"animate":{"frameID":"e82","animateQueue":[{"animateName":"fadeInLeftBig","fire":1,"name":"fadeInLeftBig","elemID":"e169","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"fadeInDown","fire":1,"name":"fadeInDown","elemID":"e170","delay":"0s","duration":"1s","type":0,"index":1}]}},"e137":{"children":{},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.2800925925925924,"translateX":-1368,"translateY":-222,"zIndex":13}},"e140":{"children":{},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.3644984805735847,"translateX":-1864,"translateY":-58,"zIndex":14}},"e141":{"children":{},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.44378438587275776,"translateX":-1486,"translateY":306,"zIndex":15}},"e144":{"children":{"e145":{"property":{"type":"text","padding":"5px","width":438,"height":513,"text":"<ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p style=\"line-height: 1; text-align: left; ;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px; color: rgb(255, 0, 0);\">JSONP</span></span></p></li><li><p style=\"line-height: 1; text-align: left; ;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px;\">CORS</span></span></p></li><li><p style=\"line-height: 1; text-align: left; ;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px;\">PostMessage</span></span></p></li><li><p style=\"line-height: 1; text-align: left; ;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px; color: rgb(255, 0, 0);\">Flash</span></span></p></li><li><p style=\"line-height: 1; text-align: left; ;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px; color: rgb(255, 0, 0);\">Referer</span></span></p></li><li><p style=\"text-align: left;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px;\">window.name</span></span></p></li><li><p style=\"text-align: left;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px;\">location.hash</span></span></p></li><li><p style=\"text-align: left;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 44px; line-height: 45px;\">opener</span></span></p></li></ul>","rotate":0,"scale":1,"translateX":-422,"translateY":-98.5,"zIndex":1}},"e146":{"property":{"type":"text","padding":"5px","width":1028,"height":126,"text":"<p style=\"margin-top: 41px;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 48px; line-height: 45px;\">常见跨域或伪跨域方法（传递信息的方法）</span></span></p>","rotate":0,"scale":1,"translateX":-150,"translateY":368,"zIndex":2}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-3840,"translateY":1300,"zIndex":16}},"e160":{"children":{"e162":{"property":{"type":"text","padding":"5px","width":981,"height":79,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; text-align: center; \">例子1、新浪股吧jsonp劫持导致的CSRF蠕虫</span></p>","rotate":0,"scale":1,"translateX":-140.5,"translateY":-314.5,"zIndex":1}},"e163":{"property":{"type":"image","rotate":0,"scale":1,"translateX":14.5,"translateY":-147,"zIndex":2,"width":1301,"realWidth":2478,"height":246,"realHeight":468,"src":"resource/aeb901ce1df0a58e190123e8306cba4381143a8c.png"}},"e164":{"property":{"type":"text","padding":"5px","width":298,"height":74,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">不再提示缺少吧id</span></span></p>","rotate":0,"scale":1,"translateX":523,"translateY":-7,"zIndex":3}},"e165":{"property":{"type":"image","rotate":0,"scale":1,"translateX":12,"translateY":192,"zIndex":4,"width":1306,"realWidth":2558,"height":398,"realHeight":780,"src":"resource/47246eb4010c13cd3bd2c360ea7eef24d6e7f4d4.png"}},"e166":{"property":{"type":"text","padding":"5px","width":161,"height":62,"text":"<p style=\"\"><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">发帖成功！</span></font></p>","rotate":0,"scale":1,"translateX":-68.5,"translateY":217,"zIndex":5}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-1560,"translateY":-2040,"zIndex":17},"animate":{"frameID":"e160","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e163","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e164","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e165","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e166","delay":"0s","duration":"1s","type":0,"index":3}]}},"e177":{"children":{},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.2122883857684937,"translateX":-3563,"translateY":-2086,"zIndex":18}},"e178":{"children":{},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.20993876126668437,"translateX":-3596,"translateY":-1706,"zIndex":19}},"e179":{"children":{"e180":{"property":{"type":"text","padding":"5px","width":1039,"height":85,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; \">例2、fanwe o2o商业系统jsonp劫持用户信息</span></p>","rotate":0,"scale":1,"translateX":-147.5,"translateY":-326.5,"zIndex":1}},"e182":{"property":{"type":"text","padding":"5px","width":1126,"height":62,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">漏洞成因：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; color: rgb(255, 0, 0);\">框架通用</span>输出函数output，<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; color: rgb(255, 0, 0);\">默认支持</span>jsonp格式输出，并<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; color: rgb(255, 0, 0);\">可控</span></span></p>","rotate":0,"scale":1,"translateX":-104,"translateY":-243,"zIndex":2}},"e183":{"property":{"type":"shape","param":{"shape":{"svgData":"M19.883,5.71H2.746c-0.163,0-0.319,0.071-0.435,0.188c-0.118,0.117-0.18,0.272-0.18,0.435v18.364c0,0.164,0.063,0.318,0.18,0.436c0.123,0.117,0.287,0.18,0.435,0.18h25.75c0.164,0,0.324-0.066,0.438-0.18c0.118-0.114,0.182-0.273,0.182-0.436V14.551c-0.002-0.102-0.01-0.188-0.021-0.271c-0.186-1.543-1.543-3.424-3.236-5.168C24.039,7.31,21.869,5.753,19.883,5.71zM26.914,12.314c-0.008-0.005-0.019-0.007-0.029-0.01c-1.092-0.293-2.33-0.355-3.199-0.355c-0.162,0-0.312,0.002-0.445,0.004c-0.037-0.604-0.129-1.604-0.356-2.625c-0.11-0.461-0.246-0.94-0.433-1.42c0.857,0.541,1.748,1.264,2.535,2.068C25.74,10.718,26.41,11.551,26.914,12.314zM3.365,6.947h16.517c0.058,0,0.12,0,0.183,0.004c0.694,0.105,1.307,1.221,1.616,2.646c0.335,1.484,0.354,2.997,0.354,3l0.007,0.656l0.651-0.051c0,0,0.398-0.027,0.99-0.025c0.809,0,1.977,0.062,2.871,0.312c0.939,0.275,1.352,0.635,1.326,1.051h0.002v9.542H3.365V6.951V6.947z","controls":"","type":"svg_icon","style":{"width":251,"height":251}},"width":251,"height":251},"width":251,"height":251,"rotate":0,"scale":1,"translateX":359.5,"translateY":303.5,"zIndex":3}},"e184":{"property":{"type":"text","padding":"5px","width":98,"height":57,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">框架</span></font></p>","rotate":0,"scale":1,"translateX":348,"translateY":303.5,"zIndex":4}},"e185":{"property":{"type":"shape","param":{"shape":{"svgData":"M2,2 38,2 38,28 12,28 5,38 6,28 2,28z","controls":[{"id":"svg_cp_14358913791610","x":5,"y":38,"bindPoint":4,"type":"drag-x","linkPoint":[{"index":4,"func":"x"}]},{"id":"svg_cp_14358913791611","x":12,"y":28,"bindPoint":3,"type":"drag-x","linkPoint":[{"index":3,"func":"x"},{"index":5,"func":"x"}]},{"id":"svg_cp_14358913791612","x":2,"y":28,"bindPoint":6,"type":"drag-y","linkPoint":[{"index":2,"func":"y"},{"index":3,"func":"y"},{"index":5,"func":"y"},{"index":6,"func":"y"}]}],"type":"svg_shape","style":{"width":242,"height":161,"stroke":"rgba(0,0,0,1)","fill":"rgba(0,0,0,0)","stroke-width":"2px"}},"width":242,"height":161},"width":242,"height":161,"rotate":0,"scale":1,"translateX":523,"translateY":143.5,"zIndex":5}},"e186":{"property":{"type":"text","padding":"5px","width":148,"height":63,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">我的锅？</span></span></p>","rotate":0,"scale":1,"translateX":543,"translateY":127.5,"zIndex":6}},"e218":{"property":{"type":"text","padding":"5px","width":572,"height":168,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">谁的锅？</span></p><ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">框架 70%</span></p></li><li><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">开发者 30%</span></p></li></ul>","rotate":0,"scale":1,"translateX":-381,"translateY":-118,"zIndex":7}},"e219":{"property":{"type":"text","padding":"5px","width":1081,"height":56,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">框架允许用户控制输出格式，导致任意调用output函数的位置均可输出jsonp。</span></p>","rotate":0,"scale":1,"translateX":-126.5,"translateY":58,"zIndex":8}},"e220":{"property":{"type":"text","padding":"5px","width":966,"height":44,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">框架输出信息时将session id输出，导致泄露用户会话。</span></span></p>","rotate":0,"scale":1,"translateX":-184,"translateY":117,"zIndex":9}},"e221":{"property":{"type":"text","padding":"5px","width":1045,"height":53,"text":"<p style=\"\"><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">开发者未明确output函数的意义，将敏感信息（用户密码）送给output输出。</span></font></p>","rotate":0,"scale":1,"translateX":-144.5,"translateY":178.5,"zIndex":10}},"e229":{"property":{"type":"text","padding":"5px","width":147,"height":63,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">直接原因</span></span></p>","rotate":0,"scale":1,"translateX":-593.5,"translateY":9.5,"zIndex":11}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-5156,"translateY":-686,"zIndex":20},"animate":{"frameID":"e179","animateQueue":[{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e182","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e183","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e184","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e186","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e185","delay":"0s","duration":"1s","type":0,"index":4},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e218","delay":"0s","duration":"1s","type":0,"index":5},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e229","delay":"0s","duration":"1s","type":0,"index":6},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e219","delay":"0s","duration":"1s","type":0,"index":7},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e220","delay":"0s","duration":"1s","type":0,"index":8},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e221","delay":"0s","duration":"1s","type":0,"index":9}]}},"e187":{"children":{"e189":{"property":{"type":"text","padding":"5px","width":1079,"height":91,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; \">例2、fanwe o2o商业系统jsonp劫持用户信息</span></p>","rotate":0,"scale":1,"translateX":-113.5,"translateY":-336.5,"zIndex":1}},"e190":{"property":{"type":"text","padding":"5px","width":1286,"height":57,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">深挖：查找所有调用output函数的地方，注意关键词“user/token/password”</span></p>","rotate":0,"scale":1,"translateX":-10,"translateY":-252.5,"zIndex":2}},"e191":{"property":{"type":"text","padding":"5px","width":597,"height":293,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">关键词可能出现的地方：</span></span></p><ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">文件名</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">类名</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">函数名<br/></span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">参数名</span></span></p></li></ol>","rotate":0,"scale":1,"translateX":-354.5,"translateY":-71.5,"zIndex":3}},"e202":{"property":{"type":"image","rotate":0,"scale":1,"translateX":114,"translateY":60.5,"zIndex":4,"width":1128,"realWidth":1302,"height":355,"realHeight":410,"src":"resource/2eeec6ba27bf02f5123f59440228a86d23a69086.png"}},"e203":{"property":{"type":"text","padding":"5px","width":539,"height":104,"text":"<p style=\"line-height: 1; margin-bottom: 0px; margin-top: 23px;\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 58px; line-height: 45px; color: rgb(255, 0, 0);\">关键词：user_pwd</span></span></p>","rotate":0,"scale":1,"translateX":-354.5,"translateY":348,"zIndex":5}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-5156,"translateY":-3746,"zIndex":21},"animate":{"frameID":"e187","animateQueue":[{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e190","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e191","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e202","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e203","delay":"0s","duration":"1s","type":0,"index":3}]}},"e192":{"children":{"e193":{"property":{"type":"shape","param":{"shape":{"svgData":"M4,18 36,18 36,22 4,22Z","controls":[],"type":"svg_shape","style":{"width":1626,"height":325,"stroke":"rgba(0,0,0,0)","fill":"rgb(255, 0, 0)","stroke-width":"2px"}},"width":1626,"height":325,"fill":"rgb(255, 0, 0)"},"width":1626,"height":325,"rotate":0,"scale":1,"translateX":18,"translateY":-17.5,"zIndex":1}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":0.22227428990118225,"translateX":-3616,"translateY":-1940,"zIndex":22},"animate":{"frameID":"e192","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e193","delay":"0s","duration":"1s","type":0,"index":0}]}},"e194":{"children":{"e195":{"property":{"type":"text","padding":"5px","width":1195,"height":91,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; \">例2、fanwe o2o商业系统jsonp劫持用户信息</span></p>","rotate":0,"scale":1,"translateX":-62.5,"translateY":-323.5,"zIndex":1}},"e196":{"property":{"type":"text","padding":"5px","width":804,"height":58,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">敏感字眼：SESS_ID ==&gt; <span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">SESSION ID</span></span></span></p>","rotate":0,"scale":1,"translateX":-258,"translateY":-252,"zIndex":2}},"e197":{"property":{"type":"text","padding":"5px","width":1242,"height":52,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">SESSION是用户会话，获取了一个用户的SESSION等于与该用户拥有同样权限。</span></span></p>","rotate":0,"scale":1,"translateX":-39,"translateY":-200,"zIndex":3}},"e198":{"property":{"type":"text","padding":"5px","width":720,"height":55,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">利用蚁逅平台实时地截取JSONP数据：</span></span></p>","rotate":0,"scale":1,"translateX":-300,"translateY":-63.5,"zIndex":4}},"e199":{"property":{"type":"image","rotate":0,"scale":1,"translateX":272.5,"translateY":174.5,"zIndex":5,"width":801,"realWidth":1440,"height":513,"realHeight":923,"src":"resource/c9000ad439525a77bf71231fa11b97dbdce80571.png"}},"e200":{"property":{"type":"text","padding":"5px","width":183,"height":130,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 73px; color: rgb(255, 0, 0); background-color: rgba(0, 0, 0, 0);\">神器</span></p>","rotate":35.848847,"scale":1,"translateX":660.5,"translateY":-65,"zIndex":6}},"e205":{"property":{"type":"text","padding":"5px","width":854,"height":68,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">任意调用output函数的位置均会泄露sessid：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; color: rgb(255, 0, 0);\">框架漏洞</span></span></p>","rotate":0,"scale":1,"translateX":-233,"translateY":-130,"zIndex":7}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-6736,"translateY":-920,"zIndex":23},"animate":{"frameID":"e194","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e196","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e197","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e205","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e198","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e199","delay":"0s","duration":"1s","type":0,"index":4},{"animateName":"bounceInDown","fire":1,"name":"bounceInDown","elemID":"e200","delay":"0s","duration":"1s","type":0,"index":5}]}},"e206":{"children":{"e207":{"property":{"type":"text","padding":"5px","width":1204,"height":74,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例2、fanwe o2o商业系统jsonp劫持用户信息</span></p>","rotate":0,"scale":1,"translateX":-60,"translateY":-347,"zIndex":1}},"e210":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-34.5,"translateY":90.5,"zIndex":2,"width":1443,"realWidth":784,"height":549,"realHeight":298,"src":"resource/6b744aada557fe89117ae39302f535db1bb89c5b.png"}},"e217":{"property":{"type":"text","padding":"5px","width":573,"height":158,"text":"<p style=\";\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 55px; line-height: 45px; color: rgb(255, 0, 0);\">漏洞利用过程：</span></span></p>","rotate":0,"scale":1,"translateX":-375.5,"translateY":-153,"zIndex":3}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1.2326128256791027,"translateX":-3596,"translateY":-4766,"zIndex":24},"animate":{"frameID":"e206","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e217","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e210","delay":"0s","duration":"1s","type":0,"index":1}]}},"e212":{"children":{"e213":{"property":{"type":"text","padding":"5px","width":1070,"height":85,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例2、fanwe o2o商业系统jsonp劫持用户信息</span></p>","rotate":0,"scale":1,"translateX":-134,"translateY":-341.5,"zIndex":1}},"e214":{"property":{"type":"image","rotate":0,"scale":1,"translateX":5,"translateY":26,"zIndex":2,"width":1358,"realWidth":1592,"height":614,"realHeight":720,"src":"resource/6758b3157c62a2a5ec5050295efbefae3823a525.png"}},"e215":{"property":{"type":"text","padding":"5px","width":194,"height":91,"text":"<p style=\";\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 55px; line-height: 45px; color: rgb(255, 0, 0);\">GET!</span></span></p>","rotate":0,"scale":1,"translateX":221,"translateY":169.5,"zIndex":3}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-476,"translateY":-4766,"zIndex":25},"animate":{"frameID":"e212","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e214","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e215","delay":"0s","duration":"1s","type":0,"index":1}]}},"e222":{"children":{"e224":{"property":{"type":"text","padding":"5px","width":1231,"height":68,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; \">例2、总结</span></p>","rotate":0,"scale":1,"translateX":-40.5,"translateY":-358,"zIndex":1}},"e225":{"property":{"type":"text","padding":"5px","width":1212,"height":170,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">思考：开源应用中jsonp劫持的案例</span></span></p><ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">框架为适应各种环境，默认支持jsonp输出，且<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">用户可以控制</span></span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">开发者<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">未明确框架输出函数的意义</span>，将敏感信息交给其输出，导致jsonp泄露</span></span></p></li></ol>","rotate":0,"scale":1,"translateX":-50,"translateY":-221,"zIndex":2}},"e226":{"property":{"type":"text","padding":"5px","width":700,"height":51,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">题外思考：基于框架的开源应用漏洞挖掘思路</span></span></p>","rotate":0,"scale":1,"translateX":-306,"translateY":145.5,"zIndex":3}},"e227":{"property":{"type":"text","padding":"5px","width":1042,"height":224,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">修复：</span></span></p><ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">r_type不允许用户定义，使其作为函数参数传入</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">session id不要直接输出在页面中，否则其http only的属性将无意义</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">用户敏感信息（如密码）不要输出在数据包中</span></span></p></li></ol>","rotate":0,"scale":1,"translateX":-134,"translateY":-14,"zIndex":4}},"e228":{"property":{"type":"image","rotate":0,"scale":1,"translateX":269,"translateY":230.5,"zIndex":5,"width":500,"realWidth":640,"height":375,"realHeight":480,"src":"resource/98ee07f613140397076fb7e8ccb194179d5be122.jpeg"}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-6716,"translateY":334,"zIndex":26},"animate":{"frameID":"e222","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e225","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e227","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e226","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e228","delay":"0s","duration":"1s","type":0,"index":3}]}},"e230":{"children":{"e231":{"property":{"type":"text","padding":"5px","width":1192,"height":74,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例3、Discuz默认配置情况下Flash窃取Token</span></p>","rotate":0,"scale":1,"translateX":-39,"translateY":-361,"zIndex":1}},"e233":{"property":{"type":"text","padding":"5px","width":1320,"height":118,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">crossdomain.xml</span></span></p><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">&nbsp;&nbsp;&nbsp;&nbsp;当flash请求一个网页时，会先请求该域名下的crossdomain.xml，来确认其是否允许请求。<br/></span></span></p>","rotate":0,"scale":1,"translateX":25,"translateY":-231,"zIndex":2}},"e235":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-117.5,"translateY":130.5,"zIndex":3,"width":1101,"realWidth":858,"height":655,"realHeight":510,"src":"resource/6364d6bb680c9a6c09a4455e3b8d27dc8d2949b6.png"}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-648,"translateY":2605,"zIndex":27},"animate":{"frameID":"e230","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e235","delay":"0s","duration":"1s","type":0,"index":0}]}},"e236":{"children":{"e237":{"property":{"type":"text","padding":"5px","width":1187,"height":81,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例3、Discuz默认配置情况下Flash窃取Token</span></p>","rotate":0,"scale":1,"translateX":-28.5,"translateY":-341.5,"zIndex":1}},"e238":{"property":{"type":"text","padding":"5px","width":1155,"height":59,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Discuz默认情况下allow-access-from = * （允许所有域下Flash访问）</span></span></p>","rotate":0,"scale":1,"translateX":-44.5,"translateY":-249.5,"zIndex":2}},"e239":{"property":{"type":"text","padding":"5px","width":538,"height":54,"text":"<p><strong><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(0, 0, 0);\">漏洞：任何域可获取discuz token</span></span></strong></p>","rotate":0,"scale":1,"translateX":-353,"translateY":-191,"zIndex":3}},"e240":{"property":{"type":"text","padding":"5px","width":533,"height":55,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">借助蚁逅平台获取目标Discuz源文件：</span></font></p>","rotate":0,"scale":1,"translateX":-355.5,"translateY":-126.5,"zIndex":4}},"e241":{"property":{"type":"image","rotate":0,"scale":1,"translateX":302.5,"translateY":121,"zIndex":5,"width":799,"realWidth":1440,"height":570,"realHeight":1027,"src":"resource/5eb63751cb01b97526a3bbd717e7c9fee7caab99.png"}},"e242":{"property":{"type":"image","rotate":0,"scale":1,"translateX":303,"translateY":122,"zIndex":6,"width":798,"realWidth":1440,"height":572,"realHeight":1031,"src":"resource/7c42b3790bfad34d1138786d09f41a0aa34048c3.png"}},"e243":{"property":{"type":"text","padding":"5px","width":489,"height":475,"text":"<p><span style=\"font-size: 30px;\">存在漏洞的安全社区（红色）</span></p><p><span style=\"font-size: 30px;\">https://www.t00ls.net/</span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\">https://forum.90sec.org/</span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\">http://bbs.secbox.cn/</span></p><p><span style=\"font-size: 30px;\">http://forum.cnsec.org/</span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\">http://www.binvul.com/</span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\">http://www.unpack.cn/</span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\"><span style=\"font-size: 30px; color: rgb(0, 0, 0);\">http://bbs.blackbap.org/</span></span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\"><span style=\"font-size: 30px; color: rgb(0, 0, 0);\"> http://www.ihonker.org/&nbsp;</span></span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\"><span style=\"font-size: 30px; color: rgb(0, 0, 0);\"><br/></span></span></p><p><span style=\"font-size: 30px; color: rgb(255, 0, 0);\"><span style=\"font-size: 30px; color: rgb(0, 0, 0);\"><br/></span></span></p><p><br/></p>","rotate":0,"scale":1,"translateX":-377.5,"translateY":154.5,"zIndex":7}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-2400,"translateY":2605,"zIndex":28},"animate":{"frameID":"e236","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e238","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e239","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e240","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e241","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e242","delay":"0s","duration":"1s","type":0,"index":4},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e243","delay":"0s","duration":"1s","type":0,"index":5}]}},"e244":{"children":{"e245":{"property":{"type":"text","padding":"5px","width":1138,"height":79,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例3、Discuz默认配置情况下Flash窃取Token</span></p>","rotate":0,"scale":1,"translateX":-68,"translateY":-352.5,"zIndex":1}},"e246":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-5.5,"translateY":-48.5,"zIndex":2,"width":1353,"realWidth":2160,"height":501,"realHeight":800,"src":"resource/edaeeeff5c3549252469fe302350f419b688afed.png"}},"e247":{"property":{"type":"text","padding":"5px","width":1097,"height":186,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Discuz对CSRF的检查策略：</span></span></p><ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">检查formhash（Token）</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">检查referer （<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">如何绕过？</span>）</span></span></p></li></ol><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\"></span></span></p>","rotate":0,"scale":1,"translateX":-99.5,"translateY":316,"zIndex":3}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-3960,"translateY":2605,"zIndex":29},"animate":{"frameID":"e244","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e246","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e247","delay":"0s","duration":"1s","type":0,"index":1}]}},"e249":{"children":{"e251":{"property":{"type":"text","padding":"5px","width":1126,"height":71,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例3、Discuz默认配置情况下Flash窃取Token</span></p>","rotate":0,"scale":1,"translateX":-70,"translateY":-356.5,"zIndex":1}},"e252":{"property":{"type":"text","padding":"5px","width":905,"height":186,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Referer绕过方法</span></span></p><ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">利用空Referer可进行绕过（https -&gt; http跨协议发送数据包）</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">特殊子域名绕过（<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(0, 18, 255);\">http://wsq.discuz.qq.com</span>.jjfly.party/）</span></span></p></li></ul>","rotate":0,"scale":1,"translateX":-180.5,"translateY":-218,"zIndex":2}},"e254":{"property":{"type":"text","padding":"5px","width":1152,"height":145,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">POC：<a href=\"http://wsq.discuz.qq.com.jjfly.party/game/discuz/csrf.html\" _src=\"http://wsq.discuz.qq.com.jjfly.party/game/discuz/csrf.html\">http://wsq.discuz.qq.com.jjfly.party/game/discuz/csrf.html</a>&nbsp;</span></span></p><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">默认安装好Discuz，关闭发帖验证码，访问该POC的已登录用户即会发表一篇帖子。</span></span></p>","rotate":0,"scale":1,"translateX":-57,"translateY":-42.5,"zIndex":3}},"e255":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-168,"translateY":211,"zIndex":4,"width":940,"realWidth":1866,"height":418,"realHeight":830,"src":"resource/70274ba65000f5b0ee297f67f93a0e58d2e1300e.png"}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-3960,"translateY":3625,"zIndex":30},"animate":{"frameID":"e249","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e252","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e254","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e255","delay":"0s","duration":"1s","type":0,"index":2}]}},"e256":{"children":{"e257":{"property":{"type":"text","padding":"5px","width":1134,"height":80,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例3、总结</span></p>","rotate":0,"scale":1,"translateX":-81,"translateY":-343,"zIndex":1}},"e258":{"property":{"type":"text","padding":"5px","width":684,"height":55,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">导致Discuz CSRF漏洞的原因分析</span></span></p>","rotate":0,"scale":1,"translateX":-306,"translateY":-265.5,"zIndex":2}},"e259":{"property":{"type":"text","padding":"5px","width":1113,"height":119,"text":"<ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">默认<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">crossdomain.xml配置不当</span>，导致允许跨域请求，泄露Token。</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Referer检查逻辑错误：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">空Referer</span>/<span style=\"font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">域名伪造</span></span></span></p></li></ol>","rotate":0,"scale":1,"translateX":-91.5,"translateY":-168.5,"zIndex":3}},"e260":{"property":{"type":"text","padding":"5px","width":912,"height":246,"text":"<p style=\"white-space: normal;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-size: 30px; line-height: 45px;\"><span style=\"color: rgb(1, 1, 1);\">修复方式</span></span></span></p><ol class=\" list-paddingleft-2\" style=\"width: 1100px; white-space: normal;\"><li><p><span style=\"color: rgb(1, 1, 1); font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-size: 30px; line-height: 45px;\">修改crossdomain.xml中的</span></span><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\">allow-access-from为指定域名</span></p></li><li><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px;\">不允许空Referer的请求</span></p></li><li><p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;;\"><span style=\"font-size: 30px; line-height: 45px;\">修复Referer检查处逻辑错误</span></span></p></li></ol><p><br/></p>","rotate":0,"scale":1,"translateX":-192,"translateY":16,"zIndex":4}},"e261":{"property":{"type":"text","padding":"5px","width":1058,"height":59,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">思考：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">当allow-access-from = localdiscuz.com时，如何利用？</span></span></span></p>","rotate":0,"scale":1,"translateX":-119,"translateY":227.5,"zIndex":5}},"e262":{"property":{"type":"text","padding":"5px","width":1347,"height":133,"text":"<ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">http://localdiscuz.com/data/attachment/forum/201507/03/032336gx6qhw3h9xhn7ydf.gif&nbsp;</span></p></li><li><p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px;\">http://xdsec.mhz.pw/game/discuz/c00y.swf&nbsp;</span></p></li></ul>","rotate":0,"scale":1,"translateX":25.5,"translateY":333.5,"zIndex":6}},"e267":{"property":{"type":"text","padding":"5px","width":1300,"height":52,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">收集：开源应用中，crossdomain.xml默认存在漏洞的案例：Discuz/phpwind/phpcms/...</span></span></p>","rotate":0,"scale":1,"translateX":2,"translateY":161,"zIndex":7}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-5520,"translateY":3625,"zIndex":31},"animate":{"frameID":"e256","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e258","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e259","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e260","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e267","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e261","delay":"0s","duration":"1s","type":0,"index":4},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e262","delay":"0s","duration":"1s","type":0,"index":5}]}},"e263":{"children":{"e265":{"property":{"type":"text","padding":"5px","width":1186,"height":77,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例4、phpcms Referer泄露Token</span></p>","rotate":0,"scale":1,"translateX":-59,"translateY":-362.5,"zIndex":1}},"e266":{"property":{"type":"text","padding":"5px","width":1182,"height":53,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Token放在URL中产生的安全问题：页面中任意对外的HTTP请求均会泄露Token</span></span></p>","rotate":0,"scale":1,"translateX":-61,"translateY":-287.5,"zIndex":2}},"e268":{"property":{"type":"text","padding":"5px","width":625,"height":49,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">PHPCMS后台所有页面URL中均包含token</span></font></p>","rotate":0,"scale":1,"translateX":-339.5,"translateY":-226.5,"zIndex":3}},"e269":{"property":{"type":"text","padding":"5px","width":1278,"height":49,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">思考：任意一个CMS后台，利用哪些功能，用户可能与后台管理员交互？</span></span></p>","rotate":0,"scale":1,"translateX":-13,"translateY":-167.5,"zIndex":4}},"e270":{"property":{"type":"text","padding":"5px","width":939,"height":311,"text":"<ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">文章投稿（html富文本）</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">留言版（插入图片或链接）</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">文章评论</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">友情链接（目标地址或logo图片）</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">举报/投诉</span></span></p></li></ul>","rotate":0,"scale":1,"translateX":-182.5,"translateY":22.5,"zIndex":5}},"e271":{"property":{"type":"text","padding":"5px","width":836,"height":50,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">无法插入超链接或图片：<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">借助浏览器右键 - 新标签打开</span></span></span></p>","rotate":0,"scale":1,"translateX":-234,"translateY":218,"zIndex":6}},"e272":{"property":{"type":"text","padding":"5px","width":1174,"height":55,"text":"<p><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Firefox下，选中链接后，右键打开，将附带Referer，而其他浏览器不会。</span></font></p>","rotate":0,"scale":1,"translateX":-65,"translateY":280.5,"zIndex":7}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-5520,"translateY":2605,"zIndex":32},"animate":{"frameID":"e263","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e266","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e268","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e269","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e270","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e271","delay":"0s","duration":"1s","type":0,"index":4},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e272","delay":"0s","duration":"1s","type":0,"index":5}]}},"e273":{"children":{"e274":{"property":{"type":"text","padding":"5px","width":1146,"height":73,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例4、phpcms Referer泄露Token</span></p>","rotate":0,"scale":1,"translateX":-82,"translateY":-346.5,"zIndex":1}},"e276":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-378,"translateY":-131.5,"zIndex":2,"width":564,"realWidth":723,"height":315,"realHeight":403,"src":"resource/31517769a4e9584ab80b1316bcc3c6e5cbed991d.jpeg"}},"e277":{"property":{"type":"image","rotate":0,"scale":1,"translateX":6.5,"translateY":265,"zIndex":3,"width":1171,"realWidth":1203,"height":344,"realHeight":353,"src":"resource/1548c1489535525a7206987a84e177c53da500e4.jpeg"}},"e278":{"property":{"type":"image","rotate":0,"scale":1,"translateX":340.5,"translateY":-131,"zIndex":4,"width":731,"realWidth":731,"height":186,"realHeight":186,"src":"resource/e836536091d9b7b375b9719d5d739a873a83239b.jpeg"}},"e279":{"property":{"type":"shape","param":{"shape":{"svgData":"M 1,15 30,15 30,5 39,20 30,35 30,25 1,25 Z","controls":[{"id":"svg_cp_14359375813870","x":30,"y":15,"bindPoint":1,"type":"drag","linkPoint":[{"index":1,"func":"x"},{"index":2,"func":"x"},{"index":4,"func":"x"},{"index":5,"func":"x"},{"index":0,"func":"y"},{"index":1,"func":"y"},{"index":5,"func":"-y"},{"index":6,"func":"-y"}]}],"type":"svg_shape","style":{"width":137,"height":55,"stroke":"rgb(255, 21, 21)","fill":"rgba(0,0,0,0)","stroke-width":"2px"}},"width":137,"height":55,"stroke":"rgb(255, 21, 21)"},"width":137,"height":55,"rotate":62.798434,"scale":1,"translateX":-263.5,"translateY":105.5,"zIndex":5}},"e280":{"property":{"type":"shape","param":{"shape":{"svgData":"M 1,15 30,15 30,5 39,20 30,35 30,25 1,25 Z","controls":[{"id":"svg_cp_14359375813870","x":30,"y":15,"bindPoint":1,"type":"drag","linkPoint":[{"index":1,"func":"x"},{"index":2,"func":"x"},{"index":4,"func":"x"},{"index":5,"func":"x"},{"index":0,"func":"y"},{"index":1,"func":"y"},{"index":5,"func":"-y"},{"index":6,"func":"-y"}]}],"type":"svg_shape","style":{"width":126,"height":50,"stroke":"rgb(255, 21, 21)","fill":"rgba(0,0,0,0)","stroke-width":"2px"}},"width":126,"height":50,"stroke":"rgb(255, 21, 21)"},"width":126,"height":50,"rotate":-64.268717,"scale":1,"translateX":170,"translateY":28,"zIndex":6}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-5520,"translateY":1585,"zIndex":33},"animate":{"frameID":"e273","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e276","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e279","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e277","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e280","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e278","delay":"0s","duration":"1s","type":0,"index":4}]}},"e281":{"children":{"e282":{"property":{"type":"text","padding":"5px","width":1059,"height":71,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例4、phpcms Referer泄露Token</span></p>","rotate":0,"scale":1,"translateX":-125.5,"translateY":-344.5,"zIndex":1}},"e283":{"property":{"type":"text","padding":"5px","width":1210,"height":52,"text":"<p style=\"\"><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">PHPCMS修复方式：不再显示图片，而是直接显示地址。</span></font></p>","rotate":0,"scale":1,"translateX":-50,"translateY":-264,"zIndex":2}},"e284":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-71.5,"translateY":23.5,"zIndex":3,"width":1177,"realWidth":1420,"height":371,"realHeight":448,"src":"resource/f0e35a0a15354b57692667ec29d5a293b01cf191.png"}},"e285":{"property":{"type":"text","padding":"5px","width":764,"height":53,"text":"<p style=\"\"><font face=\"微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">右键查看源代码</span></font></p>","rotate":0,"scale":1,"translateX":-273,"translateY":-201.5,"zIndex":4}},"e286":{"property":{"type":"text","padding":"5px","width":841,"height":49,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">给所有链接都加上了pc_hash，包括外站链接！<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 30px; line-height: 45px; color: rgb(255, 0, 0);\">新</span>漏洞！</span></span></span></p>","rotate":0,"scale":1,"translateX":-234.5,"translateY":257.5,"zIndex":5}},"e296":{"property":{"type":"image","rotate":0,"scale":1,"translateX":250,"translateY":295.5,"zIndex":6,"width":314,"realWidth":550,"height":257,"realHeight":450,"src":"resource/b598b4167ab3febf60e7533d0cb4b556847240b0.jpeg"}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-7080,"translateY":1585,"zIndex":34},"animate":{"frameID":"e281","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e283","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e285","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":3,"name":"flipInX","elemID":"e284","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e286","delay":"0s","duration":"1s","type":0,"index":3},{"animateName":"bounceIn","fire":1,"name":"bounceIn","elemID":"e296","delay":"0s","duration":"1s","type":0,"index":4}]}},"e287":{"children":{"e288":{"property":{"type":"text","padding":"5px","width":1153,"height":74,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例4、phpcms Referer泄露Token</span></p>","rotate":0,"scale":1,"translateX":-71.5,"translateY":-349,"zIndex":1}},"e289":{"property":{"type":"text","padding":"5px","width":985,"height":58,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">一键增加管理POC：http://mhz.pw/game/tx/phpcms.php</span></span></p>","rotate":0,"scale":1,"translateX":-155.5,"translateY":-273,"zIndex":2}},"e290":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-350.5,"translateY":-126,"zIndex":3,"width":605,"realWidth":1274,"height":226,"realHeight":476,"src":"resource/fed38d6e43bfb167a89f1ed815404ca0e3ec0bcb.png"}},"e291":{"property":{"type":"image","rotate":0,"scale":1,"translateX":342.5,"translateY":48,"zIndex":4,"width":723,"realWidth":1154,"height":520,"realHeight":828,"src":"resource/caa45211994aca3213144c7d358c48925534eab7.png"}},"e292":{"property":{"type":"image","rotate":0,"scale":1,"translateX":-350,"translateY":194,"zIndex":5,"width":604,"realWidth":1002,"height":228,"realHeight":378,"src":"resource/6e8d8c539fb08a7af4f387c10eb738495400e25d.png"}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-8640,"translateY":1585,"zIndex":35},"animate":{"frameID":"e287","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e289","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e290","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e291","delay":"0s","duration":"1s","type":0,"index":2},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e292","delay":"0s","duration":"1s","type":0,"index":3}]}},"e293":{"children":{"e294":{"property":{"type":"text","padding":"5px","width":1114,"height":82,"text":"<p><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px; line-height: 67.5px; \">例4、总结</span></p>","rotate":0,"scale":1,"translateX":-90,"translateY":-349,"zIndex":1}},"e295":{"property":{"type":"text","padding":"5px","width":1099,"height":179,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">导致漏洞的直接原因</span></span></p><ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">pc_hash直接放在URL中，导致安全隐患，难以修复。</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">链接中增加pc_hash没有区分链接是站内还是站外，导致pc_hash泄露。</span></span></p></li></ul>","rotate":0,"scale":1,"translateX":-97.5,"translateY":-208.5,"zIndex":2}},"e297":{"property":{"type":"text","padding":"5px","width":1190,"height":239,"text":"<p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">修复：</span></span></p><ol class=\" list-paddingleft-2\" style=\"list-style-type: decimal;\"><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">判断站内url才添加pc_hash</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">逐步删除url中的pc_hash，改放入form表单中</span></span></p></li><li><p style=\"\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">后台与前台能直接交互的页面，不允许插入富文本和url、图片</span></span></p></li></ol>","rotate":0,"scale":1,"translateX":-52,"translateY":10.5,"zIndex":3}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-8640,"translateY":565,"zIndex":36},"animate":{"frameID":"e293","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e295","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e297","delay":"0s","duration":"1s","type":0,"index":1}]}},"e299":{"children":{"e300":{"property":{"type":"text","padding":"5px","width":820,"height":79,"text":"<p style=\"line-height:1.5;\"><span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 45px;\">总结 - 基于Token的CSRF绕过</span></p>","rotate":0,"scale":1,"translateX":-215,"translateY":-336.5,"zIndex":1}},"e301":{"property":{"type":"text","padding":"5px","width":787,"height":224,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Token位置：</span></span></p><ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">json/jsonp</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">html</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">url</span></span></p></li></ul>","rotate":0,"scale":1,"translateX":-231.5,"translateY":-165,"zIndex":2}},"e302":{"property":{"type":"text","padding":"5px","width":959,"height":322,"text":"<p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">获取Token方法</span></span></p><ul class=\" list-paddingleft-2\" style=\"list-style-type: disc;\"><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">jsonp劫持</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Flash跨域</span></span></p></li><li><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">Referer泄露</span></span></p></li></ul><p><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">……（远不止）</span></span></p>","rotate":0,"scale":1,"translateX":-145.5,"translateY":116,"zIndex":3}},"e303":{"property":{"type":"text","padding":"5px","width":671,"height":142,"text":"<p style=\";\"><span style=\"font-family:微软雅黑, Microsoft YaHei\"><span style=\"font-size: 30px; line-height: 45px;\">核心思想：（伪）<span style=\"font-family: 微软雅黑, &#39;Microsoft YaHei&#39;; font-size: 54px; line-height: 45px; color: rgb(255, 0, 0);\">跨域</span></span></span></p>","rotate":0,"scale":1,"translateX":-289.5,"translateY":326,"zIndex":4}}},"property":{"type":"frame","width":1440,"height":900,"rotate":0,"scale":1,"translateX":-8640,"translateY":-455,"zIndex":37},"animate":{"frameID":"e299","animateQueue":[{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e301","delay":"0s","duration":"1s","type":0,"index":0},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e302","delay":"0s","duration":"1s","type":0,"index":1},{"animateName":"flipInX","fire":1,"name":"flipInX","elemID":"e303","delay":"0s","duration":"1s","type":0,"index":2}]}}},"global":{},"jxanimate":{},"setting":{"frameHeight":900,"frameWidth":1440,"version":"1.0","playMode":"magic"},"step":["e1","e4","e8","e10","e16","e137","e140","e141","e22","e144","e30","e37","e46","e160","e82","e52","e177","e178","e192","e194","e187","e206","e212","e179","e222","e230","e236","e244","e249","e256","e263","e273","e281","e287","e293","e299","e75"],"hasAnimation":1},"wid":"w65q4a"};
+    
+	</script>
+	<!-- <script src="http://localhost:8080/target/target-script-min.js"></script> --> <!-- 用于远端调试 -->
+	<script type="text/javascript" src="js/libs/jx.all.js?t=1422196726385"></script>
+	<script type="text/javascript" src="js/common/ipress.animate.all.js?t=1422196726384"></script>
+	<script type="text/javascript" src="js/play/play.all.js?t=1422196726385"></script>
+</body>
+</html>
